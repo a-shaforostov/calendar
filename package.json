@@ -1,0 +1,45 @@
+{
+  "name": "calendar",
+  "version": "1.0.0",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
+    "bower": "^1.8.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-changed": "^2.0.0",
+    "gulp-environments": "^0.1.2",
+    "gulp-eslint": "^3.0.1",
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-less": "^3.3.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-rigger": "^0.5.8",
+    "gulp-sourcemaps": "^2.4.1",
+    "gulp-tap": "^0.1.3",
+    "gulp-uglify": "^2.0.1",
+    "gulp-watch": "^4.3.11",
+    "http-server": "^0.9.0",
+    "less-plugin-clean-css": "^1.5.1",
+    "path": "^0.12.7"
+  },
+  "scripts": {
+    "inst": "npm install && node node_modules/bower/bin/bower install",
+    "prod-build": "gulp clean && gulp --env production",
+    "dev-build": "gulp clean && gulp --env development",
+    "dev-watch": "gulp watch",
+    "dev-serve": "http-server public -p 8081"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "google"
+    ],
+    "env": {
+      "browser": true,
+      "node": false,
+      "jquery": true,
+      "es6": true
+    }
+  }
+}
