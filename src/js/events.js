@@ -21,8 +21,16 @@ class EventsList {
 	addEvent({begin, end, desc}) {
 		// debugger;
 		let event = new Event(begin, end, desc);
+		event.id = this.eventIdCounter;
 		this.events[this.eventIdCounter] = event;
 		return this.eventIdCounter++;
+	}
+
+	updateEvent({id, begin, end, desc}) {
+		let event = this.events[id];
+		event.begin = begin;
+		event.end = end;
+		event.desc = desc;
 	}
 
 	getEvent(id) {
@@ -125,7 +133,7 @@ events.forEach( (item) => {
 	eventList.addEvent(item);
 });
 
-let week = new WeekView(moment().startOf('week'));
-week.renderGrid();
-week.renderWeekEvents();
+let weekView = new WeekView(moment().startOf('week'));
+weekView.renderGrid();
+weekView.renderWeekEvents();
 

@@ -19,7 +19,8 @@
     "no-trailing-spaces": ["error", { "skipBlankLines": true }],
     "no-console": 1,
     "no-debugger": 1,
-    "max-len": [1, 120]
+    "max-len": [1, 120],
+    "no-invalid-this": 1
   },
   "externals": ["$", "_", "Handlebars"]
 }

@@ -105,7 +105,8 @@ gulp.task('watch', () => {
         gulp.start('style:build');
     });
     watch([path.watch.js], function(event, cb) {
-        gulp.start('js:build', ['js:lint']);
+        // gulp.start('js:build', ['js:lint']);
+        gulp.start('js:build');
     });
 });
 

@@ -4,7 +4,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/* global moment, _, eventList, Handlebars, WeekView */
+/* global moment, _, eventList, Handlebars, WeekView, selectWeek */
 
 var WeekView = function () {
 	function WeekView(baseDate) {
@@ -14,9 +14,21 @@ var WeekView = function () {
 	}
 
 	_createClass(WeekView, [{
+		key: 'setBaseDate',
+		value: function setBaseDate(baseDate) {
+			this.baseDate = baseDate;
+		}
+	}, {
+		key: 'moveBaseDate',
+		value: function moveBaseDate(addition) {
+			this.baseDate = moment(this.baseDate).add(addition, 'days');
+		}
+	}, {
 		key: 'renderDayEvents',
 		value: function renderDayEvents(date) {
 
+			var dayElement = $('tbody .day-col .day')[moment(date).weekday()];
+			$(dayElement).html('');
 			var data = eventList.arrangeDayEvents(eventList.getEventsByDay(date));
 			for (var i = 0; i < data.length; i++) {
 				for (var j = 0; j < data[i].length; j++) {
@@ -28,9 +40,9 @@ var WeekView = function () {
 						height: bottomMin - topMin + 'px',
 						left: 100 / data[i][j].width / 2 * i + '%', // 50*i + 'px',
 						width: Math.min(100 / data[i][j].width + 100 / data[i][j].width / 2, 100) + '%'
-					}).html('<span class="time">' + moment(data[i][j].event.begin).format('HH:mm') + ' - ' + moment(data[i][j].event.end).format('HH:mm') + '</span><br>' + data[i][j].event.desc);
+					}).html('<span class="time">' + moment(data[i][j].event.begin).format('HH:mm') + ' - ' + moment(data[i][j].event.end).format('HH:mm') + '</span><br>' + data[i][j].event.desc).data('id', data[i][j].event.id);
 
-					$($('tbody .day-col .day')[moment(date).weekday()]).append(elem);
+					$(dayElement).append(elem);
 				}
 			}
 		}
@@ -50,11 +62,15 @@ var WeekView = function () {
 			var source = document.getElementById('week-template').innerHTML;
 			var template = Handlebars.compile(source);
 			var currentDay = _.cloneDeep(this.baseDate);
-			var days = [currentDay.format('dd, DD MMM'), currentDay.add(1, 'days').format('dd, DD MMM'), currentDay.add(1, 'days').format('dd, DD MMM'), currentDay.add(1, 'days').format('dd, DD MMM'), currentDay.add(1, 'days').format('dd, DD MMM'), currentDay.add(1, 'days').format('dd, DD MMM'), currentDay.add(1, 'days').format('dd, DD MMM')];
-			// console.log(days);
+			var days = [];
+			for (var i = 0; i < 7; i++) {
+				days.push(currentDay.format('dd, DD MMM'));
+				currentDay.add(1, 'days');
+			}
 			$place.html(template({ days: days }));
 
 			$('tbody .day-col .day').height($('.grid-table tbody').height());
+			$('.header .nav-block .week-number').text(moment(this.baseDate).week());
 		}
 	}]);
 
@@ -69,10 +85,9 @@ $('.date-picker-inline').datetimepicker({
 	inline: true,
 	lang: 'uk',
 	timepicker: false,
-	defaultDate: new Date()
+	defaultDate: new Date(),
+	dayOfWeekStart: 1,
+	onSelectDate: function onSelectDate(ct) {
+		selectWeek(ct);
+	}
 });
-
-// $('.datepicker').pickadate({
-// 	selectMonths: true, // Creates a dropdown to control month
-// 	selectYears: 15 // Creates a dropdown of 15 years to control year
-// });

@@ -32,8 +32,22 @@ var EventsList = function () {
 
 			// debugger;
 			var event = new Event(begin, end, desc);
+			event.id = this.eventIdCounter;
 			this.events[this.eventIdCounter] = event;
 			return this.eventIdCounter++;
+		}
+	}, {
+		key: 'updateEvent',
+		value: function updateEvent(_ref2) {
+			var id = _ref2.id,
+			    begin = _ref2.begin,
+			    end = _ref2.end,
+			    desc = _ref2.desc;
+
+			var event = this.events[id];
+			event.begin = begin;
+			event.end = end;
+			event.desc = desc;
 		}
 	}, {
 		key: 'getEvent',
@@ -134,6 +148,6 @@ events.forEach(function (item) {
 	eventList.addEvent(item);
 });
 
-var week = new WeekView(moment().startOf('week'));
-week.renderGrid();
-week.renderWeekEvents();
+var weekView = new WeekView(moment().startOf('week'));
+weekView.renderGrid();
+weekView.renderWeekEvents();
