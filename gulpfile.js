@@ -54,7 +54,7 @@ gulp.task('js:lint', () => {
         .pipe(eslint())
         // eslint.format() outputs the lint results to the console.
         // Alternatively use eslint.formatEach() (see Docs).
-        .pipe(eslint.format())
+        .pipe(eslint.formatEach())
         // To have the process exit with an error code (1) on
         // lint error, return the stream and pipe to failAfterError last.
         .pipe(eslint.failAfterError());
@@ -62,7 +62,7 @@ gulp.task('js:lint', () => {
 
 gulp.task('html:build', () => {
     gulp.src(path.src.html) //Выберем файлы по нужному пути
-        // .pipe(rigger()) //Прогоним через rigger
+        .pipe(rigger()) //Прогоним через rigger
         .pipe(plumber())
         .pipe(htmlmin({collapseWhitespace: true})) // Минификация
         .pipe(gulp.dest(path.build.html)); //Выплюнем их в папку build
@@ -105,7 +105,7 @@ gulp.task('watch', () => {
         gulp.start('style:build');
     });
     watch([path.watch.js], function(event, cb) {
-        gulp.start('js:build');
+        gulp.start('js:build', ['js:lint']);
     });
 });
 

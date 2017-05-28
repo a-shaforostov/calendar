@@ -1,0 +1,101 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+input[type="datetime-local"] {
+  height: inherit;
+}
+
+aside {
+  width: 200px;
+  float: left;
+  text-align: center;
+  #create-event {
+    margin: 10px 0 0;
+  }
+}
+
+#week-placeholder {
+  margin-left: 200px;
+}
+
+.event {
+  position: absolute;
+  box-sizing: border-box;
+  background-color: lightgreen;
+  border: 1px solid black;
+  padding: 3px 5px;
+  font-size: 0.8rem;
+  word-wrap: break-word;
+  overflow-y: hidden;
+  .time {
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+}
+.wrapper {
+  width: 400px;
+  position: relative;
+}
+
+.xdsoft_datetimepicker {
+  transform: scale(0.75);
+  margin-left: -22px;
+}
+
+.week {
+
+}
+table.grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  td {
+    padding: 0;
+  }
+  thead tr td {
+    text-align: center;
+    font-weight: 400;
+  }
+  tbody {
+    .hours-wrapper {
+      position: relative;
+      .hours {
+        position: absolute;
+        width: 100%;
+        .hour-line {
+          box-sizing: border-box;
+          border: 1px solid lightgray;
+          height: 42px;
+          margin-bottom: -1px;
+          .half {
+            height: 21px;
+            margin-bottom: 20px;
+            border-bottom: 1px dotted lightgray;
+          }
+        }
+      }
+    }
+    .hours-labels {
+      width: 50px;
+      margin-top: -1px;
+      .hour-label {
+        box-sizing: border-box;
+        border: 1px solid lightgray;
+        height: 42px;
+        margin-bottom: -1px;
+        margin-right: -1px;
+        text-align: right;
+        padding: 2px;
+        font-size: 0.8rem;
+      }
+    }
+    .day-col {
+      border-left: 1px solid lightgrey;
+      .day {
+        position: relative;
+        margin-right: 10%;
+      }
+    }
+  }
+}
+

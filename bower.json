@@ -15,6 +15,7 @@
   "dependencies": {
     "jquery": "^3",
     "components-font-awesome": "^4.7.0",
-    "handlebars": "^4.0.8"
+    "handlebars": "^4.0.8",
+    "moment": "^2.18.1"
   }
 }

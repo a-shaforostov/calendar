@@ -5,6 +5,7 @@
     "babel-preset-es2015": "^6.9.0",
     "bower": "^1.8.0",
     "del": "^2.2.2",
+    "eslint-config-google": "^0.7.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-changed": "^2.0.0",
@@ -29,17 +30,5 @@
     "dev-build": "gulp clean && gulp --env development",
     "dev-watch": "gulp watch",
     "dev-serve": "http-server public -p 8081"
-  },
-  "eslintConfig": {
-    "extends": [
-      "eslint:recommended",
-      "google"
-    ],
-    "env": {
-      "browser": true,
-      "node": false,
-      "jquery": true,
-      "es6": true
-    }
   }
 }
