@@ -55,8 +55,6 @@ class EventsList {
 				eventsByDate[index] = item;
 			}
 		});
-		// console.log(eventsByDate);
-		// console.log(_.find(_.sortBy(eventsByDate, 'begin'), events[2]));
 		return _.sortBy(eventsByDate, 'begin');
 	}
 

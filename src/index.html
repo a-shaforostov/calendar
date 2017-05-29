@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <div id="week-placeholder"></div>
+    <div id="week-placeholder" class="noselect"></div>
 
     <div class="wrapper"></div>
 
@@ -65,7 +65,7 @@
                                 {{#times 24}}<div class="hour-label">{{pad this 2}}:00</div>{{/times}}
                             </div>
                         </td>
-                        {{#times 7}}<td class="day-col"><div class="day"></div></td>{{/times}}
+                        {{#each days}}<td class="day-col" data-index="{{@index}}"><div class="day"></div></td>{{/each}}
                     </tr>
                 </tbody>
             </table>

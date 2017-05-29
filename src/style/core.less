@@ -6,6 +6,16 @@ input[type="datetime-local"] {
   height: inherit;
 }
 
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
 aside {
   width: 200px;
   float: left;
@@ -91,9 +101,15 @@ table.grid-table {
     }
     .day-col {
       border-left: 1px solid lightgrey;
+      position: relative;
       .day {
         position: relative;
         margin-right: 10%;
+      }
+      .time-selector {
+        background-color: rgba(0, 0, 255, 0.3);
+        width: 100%;
+        position: absolute;
       }
     }
   }

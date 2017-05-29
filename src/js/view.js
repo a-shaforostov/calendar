@@ -10,6 +10,10 @@ class WeekView {
 		this.baseDate = baseDate;
 	}
 
+	getBaseDate(baseDate) {
+		return this.baseDate;
+	}
+
 	moveBaseDate(addition) {
 		this.baseDate = moment(this.baseDate).add(addition, 'days');
 	}
@@ -73,7 +77,11 @@ class WeekView {
 	}
 }
 
-$('#editevent').modal();
+$('#editevent').modal({
+	complete: () => {
+		if ($timeSelector) $timeSelector.remove();
+	}
+});
 
 $.datetimepicker.setLocale('uk');
 $('.date-picker-inline').datetimepicker({
