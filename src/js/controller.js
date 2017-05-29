@@ -42,6 +42,11 @@ $('#delete-event').on('click', () => {
 	}
 });
 
+$('#export-event').on('click', () => {
+	let form = $('#editevent form')[0];
+	eventList.getEvent(form.elements.id.value).exportEvent();
+});
+
 $('#week-placeholder').on('click', '.event', function() {
 	let eventId = $(this).data('id');
 	let event = eventList.getEvent(eventId);

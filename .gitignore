@@ -2,3 +2,6 @@
 bower_components
 node_modules/
 *.map
+public/*.html
+public/js
+public/style

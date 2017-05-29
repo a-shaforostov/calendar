@@ -9,6 +9,13 @@ class Event {
 		this.desc = desc;
 	}
 
+	exportEvent() {
+		let filename = this.desc.replace(/[|&;$%@"<>()+,]/g, "").substr(0, 50);
+		var cal = ics();
+		cal.addEvent(this.desc, '', '', this.begin, this.end);
+		cal.download(filename);
+	}
+
 }
 
 class EventsList {
