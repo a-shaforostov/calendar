@@ -1,5 +1,5 @@
 /* global notifyMe */
-let notifyMe = function(text) {
+let showNotification = function(text, options) {
 
 	// Проверка поддерживаемости браузером уведомлений
 	if (!('Notification' in window)) {
@@ -12,7 +12,7 @@ let notifyMe = function(text) {
 		if (Notification.permission === 'granted') {
 
 			// Если разрешено то создаем уведомление
-			new Notification(text);
+			new Notification(text, options);
 
 		} else {
 
@@ -21,7 +21,7 @@ let notifyMe = function(text) {
 				Notification.requestPermission(function(permission) {
 					// Если пользователь разрешил, то создаем уведомление
 					if (permission === 'granted') {
-						new Notification(text);
+						new Notification(text, options);
 					}
 				});
 			}

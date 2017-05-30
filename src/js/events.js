@@ -26,10 +26,20 @@ class EventsList {
 	}
 
 	addEvent({begin, end, desc}) {
-		// debugger;
 		let event = new Event(begin, end, desc);
 		event.id = this.eventIdCounter;
 		this.events[this.eventIdCounter] = event;
+
+		// Збереження в localStorage
+		localStorage.setItem('event-' + event.id, JSON.stringify(event));
+
+		// Нотифікация
+		let timediff = moment(moment(begin).diff(moment(new Date())));
+		if (timediff > 0) {
+			event.timer = setTimeout(function () {
+				showNotification('Починається подія ', {body: desc, icon: '../images/alarm-clock.png'});
+			}, timediff);
+		}
 		return this.eventIdCounter++;
 	}
 
@@ -38,6 +48,18 @@ class EventsList {
 		event.begin = begin;
 		event.end = end;
 		event.desc = desc;
+		if (event.timer) clearTimeout(event.timer);
+
+		// Збереження в localStorage
+		localStorage.setItem('event-' + id, JSON.stringify(event));
+
+		// Нотифікация
+		let timediff = moment(moment(begin).diff(moment(new Date())));
+		if (timediff > 0) {
+			event.timer = setTimeout(function () {
+				showNotification('Починається подія ', {body: desc, icon: 'images/alarm-clock.png'});
+			}, timediff);
+		}
 	}
 
 	getEvent(id) {
@@ -45,6 +67,11 @@ class EventsList {
 	}
 
 	deleteEvent(id) {
+		// Видалення з localStorage
+		localStorage.removeItem('event-' + id, JSON.stringify(event));
+		// Очищення таймера
+		if (this.events[id].timer) clearTimeout(this.events[id].timer);
+		// Видалення з колекції
 		delete this.events[id];
 	}
 
@@ -58,85 +85,67 @@ class EventsList {
 		return _.sortBy(eventsByDate, 'begin');
 	}
 
-	arrangeDayEvents(plainArray) {
-		// debugger;
-		if (!plainArray.length) return plainArray;
-		let array3d = [[{width: 1, event: plainArray[0]}]];
-		// Пройти всі події
-		for (let item = 1; item < plainArray.length; item++) {
-			let found = false;
-			// Шукати місце в кожній колонці
-			for (let i = 0; i < array3d.length; i++) {
-				let plane = array3d[i];
-				let lastItem = plane.slice(-1)[0];
-				if (moment(plainArray[item].begin).isSameOrAfter(lastItem.event.end)) {
-					// Якщо знайшли місце в колонці - додату подію в колонку
-					plane.push({width: 1, event: plainArray[item]});
-						array3d[i].slice(-1)[0].width++;
-					found = true;
-					break;
-				}
-			}
-			// Якщо в існуючій колонці місця не знайшлося - створити нову колонку
-			if (!found) {
-				array3d.push([{width: 1, event: plainArray[item]}]);
-				array3d.slice(-1)[0].slice(-1)[0].width++;
-			}
+}
 
-		}
-		return array3d;
+// Завантажити події local storage
+let eventList = new EventsList();
+for (let i = 0; i < localStorage.length; i++) {
+	let keyName = localStorage.key(i);
+	if (keyName.substr(0, 6) === 'event-') {
+		let event = JSON.parse(localStorage.getItem(keyName));
+		// Видаляємо подію зі сховища та створюємо ії в колекції (для оновлення id)
+		localStorage.removeItem(keyName);
+		eventList.addEvent(event);
 	}
 }
 
-
 // test
-let eventList = new EventsList();
-let events = [
-	{
-		begin: moment([2017, 4, 27, 12, 25]),
-		end: moment([2017, 4, 27, 14, 45]),
-		desc: 'Обед',
-	},
-	{
-		begin: moment([2017, 4, 27, 12, 20]),
-		end: moment([2017, 4, 27, 13, 30]),
-		desc: 'Встреча',
-	},
-	{
-		begin: moment([2017, 4, 27, 9, 10]),
-		end: moment([2017, 4, 27, 11, 40]),
-		desc: 'Автобус',
-	},
-	{
-		begin: moment([2017, 4, 27, 14, 15]),
-		end: moment([2017, 4, 27, 15, 10]),
-		desc: 'Собеседование',
-	},
-	{
-		begin: moment([2017, 4, 28, 12, 25]),
-		end: moment([2017, 4, 28, 14, 45]),
-		desc: 'Обед',
-	},
-	{
-		begin: moment([2017, 4, 28, 12, 20]),
-		end: moment([2017, 4, 28, 13, 30]),
-		desc: 'Встреча',
-	},
-	{
-		begin: moment([2017, 4, 29, 9, 10]),
-		end: moment([2017, 4, 29, 11, 40]),
-		desc: 'Автобус',
-	},
-	{
-		begin: moment([2017, 4, 29, 14, 15]),
-		end: moment([2017, 4, 29, 15, 10]),
-		desc: 'Собеседование',
-	},
-];
-
-events.forEach( (item) => {
-	eventList.addEvent(item);
-});
+// let events = [
+// 	{
+// 		begin: moment([2017, 4, 27, 12, 25]),
+// 		end: moment([2017, 4, 27, 14, 45]),
+// 		desc: 'Обед',
+// 	},
+// 	{
+// 		begin: moment([2017, 4, 27, 12, 20]),
+// 		end: moment([2017, 4, 27, 13, 30]),
+// 		desc: 'Встреча',
+// 	},
+// 	{
+// 		begin: moment([2017, 4, 27, 9, 10]),
+// 		end: moment([2017, 4, 27, 11, 40]),
+// 		desc: 'Автобус',
+// 	},
+// 	{
+// 		begin: moment([2017, 4, 27, 14, 15]),
+// 		end: moment([2017, 4, 27, 15, 10]),
+// 		desc: 'Собеседование',
+// 	},
+// 	{
+// 		begin: moment([2017, 4, 28, 12, 25]),
+// 		end: moment([2017, 4, 28, 14, 45]),
+// 		desc: 'Обед',
+// 	},
+// 	{
+// 		begin: moment([2017, 4, 28, 12, 20]),
+// 		end: moment([2017, 4, 28, 13, 30]),
+// 		desc: 'Встреча',
+// 	},
+// 	{
+// 		begin: moment([2017, 4, 29, 9, 10]),
+// 		end: moment([2017, 4, 29, 11, 40]),
+// 		desc: 'Автобус',
+// 	},
+// 	{
+// 		begin: moment([2017, 4, 29, 14, 15]),
+// 		end: moment([2017, 4, 29, 15, 10]),
+// 		desc: 'Собеседование',
+// 	},
+// ];
+//
+// events.forEach( (item) => {
+// 	eventList.addEvent(item);
+// });
 
 let weekView = new WeekView(moment().startOf('week'));
 weekView.renderGrid();

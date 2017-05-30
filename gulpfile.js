@@ -116,4 +116,5 @@ gulp.task('build', [
     'style:build'
 ]);
 
-gulp.task('default', ['js:lint', 'build']);
+// gulp.task('default', ['js:lint', 'build']);
+gulp.task('default', ['build']);

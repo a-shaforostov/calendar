@@ -19,14 +19,14 @@ $('#create-event-ok').on('click', (event) => {
 		if (form.elements.id && form.elements.id.value) {
 			eventList.updateEvent({
 				id: form.elements.id.value,
-				begin: form.elements.date1.value,
-				end: form.elements.date2.value,
+				begin: moment(form.elements.date1.value),
+				end: moment(form.elements.date2.value),
 				desc: form.elements.desc.value,
 			});
 		} else {
 			eventList.addEvent({
-				begin: form.elements.date1.value,
-				end: form.elements.date2.value,
+				begin: moment(form.elements.date1.value),
+				end: moment(form.elements.date2.value),
 				desc: form.elements.desc.value,
 			});
 		}
@@ -84,16 +84,18 @@ $('.right-week-button').on('click', () => {
 
 let $timeSelector;
 let timeSelectorTime1, timeSelectorTime2;
+let timeSelectorActive = false;
 
 // Почати виділення
 $('#week-placeholder').on('mousedown', '.day-col', function (event) {
 
 	// Не продовжувати, якщо клік по блоку події
-	if ($(event.target).hasClass('event')) return;
+	if ($(event.target).hasClass('event') || $(event.target).closest('.event').length) return;
 
 	// Відстежувати переміщення якщо натиснута ліва кнопка миші
 	if (event.buttons === 1) {
 
+		timeSelectorActive = true;
 		// Визначити координату міши відносно колонки дня
 		let yCoord = event.clientY - $(this).offset().top + $(window).scrollTop();
 
@@ -130,10 +132,12 @@ $('#week-placeholder').on('mousemove', '.day-col', function (event) {
 		let delta = t2 - t1 + 0.5;
 
 		// Оновити позицію блока виділення
-		$timeSelector.css({
-			top: t1 * $(this).height() / 24,
-			height: delta * $(this).height() / 24,
-		});
+		if ($timeSelector) {
+			$timeSelector.css({
+				top: t1 * $(this).height() / 24,
+				height: delta * $(this).height() / 24,
+			});
+		}
 
 	}
 
@@ -142,6 +146,10 @@ $('#week-placeholder').on('mousemove', '.day-col', function (event) {
 // Коли кнопку миші відпустили - закінчити виділення та створити подію
 $('#week-placeholder').on('mouseup', '.day-col', function (event) {
 
+	// Якщо не в режимі вибору, то вийти
+	if (!timeSelectorActive) return;
+
+	timeSelectorActive = false;
 	let form = $('#editevent form')[0];
 	let selectedDay = moment(weekView.getBaseDate()).add($(this).data('index'), 'days');
 
@@ -160,6 +168,7 @@ $('#week-placeholder').on('mouseup', '.day-col', function (event) {
 	form.elements.date2.value = selectedDay.hour(hr).minute(min).format('YYYY-MM-DDTHH:mm');
 
 	form.elements.desc.value = '';
+	form.elements.id.value = '';
 
 	// Відкрити вікно створення події
 	$('#delete-event, #export-event').addClass('disabled');
