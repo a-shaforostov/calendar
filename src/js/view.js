@@ -19,9 +19,9 @@ class WeekView {
 	}
 
 	arrangeDayEvents(plainArray) {
-		// debugger;
+
 		if (!plainArray.length) return plainArray;
-		let array2d = [[{width: 0, event: plainArray[0]}]];
+		let array2d = [[{event: plainArray[0]}]];
 
 		// Пройти всі події і сформувати двовимірний масив подій
 		for (let item = 1; item < plainArray.length; item++) {
@@ -32,16 +32,14 @@ class WeekView {
 				let lastItem = plane.slice(-1)[0];
 				if (moment(plainArray[item].begin).isSameOrAfter(lastItem.event.end)) {
 					// Якщо знайшли місце в колонці - додату подію в колонку
-					plane.push({width: 0, event: plainArray[item]});
-					// array2d[i].slice(-1)[0].width++;
+					plane.push({event: plainArray[item]});
 					found = true;
 					break;
 				}
 			}
 			// Якщо в існуючій колонці місця не знайшлося - створити нову колонку
 			if (!found) {
-				array2d.push([{width: 0, event: plainArray[item]}]);
-				// array2d.slice(-1)[0].slice(-1)[0].width++;
+				array2d.push([{event: plainArray[item]}]);
 			}
 
 		}
@@ -64,13 +62,16 @@ class WeekView {
 					if (!array2d[level][i].depth) array2d[level][i].depth = level + 1;
 					let _i = 0;
 					while (_i < maxLen) {
-						let _level = array2d.length - 1;
+						let _level = array2d.length - 2;
 						while (_level >= 0) {
 							// Якщо події перекриваються, та рівень ще не встановлений, то встановити його
 							if (array2d[_level][_i] && !array2d[_level][_i].depth &&
 								moment(array2d[level][i].event.begin).isBetween(
 									array2d[_level][_i].event.begin,
-									array2d[_level][_i].event.end, null, '[]')
+									array2d[_level][_i].event.end, null, '[]') &&
+								moment(array2d[_level][_i].event.begin).isBetween(
+									array2d[level][i].event.begin,
+									array2d[level][i].event.end, null, '[]')
 							)
 								array2d[_level][_i].depth = array2d[level][i].depth;
 							_level--;

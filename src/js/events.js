@@ -4,8 +4,8 @@ moment.locale('uk');
 class Event {
 
 	constructor(begin, end, desc) {
-		this.begin = begin;
-		this.end = end;
+		this.begin = moment(begin);
+		this.end = moment(end);
 		this.desc = desc;
 	}
 
@@ -26,6 +26,8 @@ class EventsList {
 	}
 
 	addEvent({begin, end, desc}) {
+		// Якщо кінець періода припадає на початок доби - зменшити період на хвилину
+		if (moment(end).format('HHmmss') === '000000') end = moment(end).subtract(1, 'minute');
 		let event = new Event(begin, end, desc);
 		event.id = this.eventIdCounter;
 		this.events[this.eventIdCounter] = event;
@@ -44,6 +46,7 @@ class EventsList {
 	}
 
 	updateEvent({id, begin, end, desc}) {
+		if (moment(end).format('HHmmss') === '000000') end = moment(end).subtract(1, 'minute');
 		let event = this.events[id];
 		event.begin = begin;
 		event.end = end;
