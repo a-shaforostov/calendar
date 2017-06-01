@@ -11,6 +11,7 @@ const del = require('del');
 const plumber = require('gulp-plumber');
 const babel = require('gulp-babel');
 const htmlmin = require('gulp-htmlmin');
+// const gulpServiceWorker = require('gulp-serviceworker');
 
 const less = require('gulp-less');
 const LessPluginCleanCSS = require('less-plugin-clean-css');
@@ -79,6 +80,13 @@ gulp.task('js:build', () => {
         .pipe(gulp.dest(path.build.js));
 });
 
+// gulp.task('offline', ['build'], function() {
+//     return gulp.src(['public/*'])
+//         .pipe(gulpServiceWorker({
+//             rootDir: 'public/',
+//         }));
+// });
+
 gulp.task('style:build', () => {
     const cleanCSSPlugin = new LessPluginCleanCSS({advanced: true});
     gulp.src(path.src.less)
@@ -117,4 +125,5 @@ gulp.task('build', [
 ]);
 
 // gulp.task('default', ['js:lint', 'build']);
+// gulp.task('default', ['offline']);
 gulp.task('default', ['build']);

@@ -68,10 +68,7 @@ class WeekView {
 							if (array2d[_level][_i] && !array2d[_level][_i].depth &&
 								moment(array2d[level][i].event.begin).isBetween(
 									array2d[_level][_i].event.begin,
-									array2d[_level][_i].event.end, null, '[]') &&
-								moment(array2d[_level][_i].event.begin).isBetween(
-									array2d[level][i].event.begin,
-									array2d[level][i].event.end, null, '[]')
+									array2d[_level][_i].event.end, null, '[]')
 							)
 								array2d[_level][_i].depth = array2d[level][i].depth;
 							_level--;
