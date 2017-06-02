@@ -16,25 +16,36 @@
     <script src="vendors/moment-with-locales.min.js"></script>
 </head>
 <body>
-    <aside>
-        <!--<button onclick="notifyMe('Notification text');">Notify!</button>-->
-        <button class="waves-effect waves-light btn" id="create-event">Додати подію</button>
-        <input id="month-calendar" class="date-picker-inline">
-    </aside>
-
     <div class="header">
+        <button class="waves-effect waves-light btn" id="create-event">Додати подію</button>
         <div class="nav-block">
             <button class="left-week-button btn">&lt;</button>
-            <span class="week-number"></span> тиждень
+            <span class="week-number"></span>
             <button class="right-week-button btn">&gt;</button>
+        </div>
+        <div class="scale">
+            <div class="btn-group">
+                <a class="waves-effect waves-light btn" data-period="day">День</a>
+                <a class="waves-effect waves-light btn selected" data-period="week">Тиждень</a>
+                <a class="waves-effect waves-light btn" data-period="month">Місяць</a>
+                <a class="waves-effect waves-light btn" data-period="year">Рік</a>
+            </div>
         </div>
     </div>
 
-    <div id="week-placeholder" class="noselect"></div>
+    <div class="content">
+        <!--<aside>-->
+            <!--&lt;!&ndash;<button onclick="notifyMe('Notification text');">Notify!</button>&ndash;&gt;-->
+            <!--<input id="month-calendar" class="date-picker-inline">-->
+        <!--</aside>-->
 
-    <div class="wrapper"></div>
+        <div id="week-placeholder" class="noselect"></div>
 
-    <script type="text/x-handlebars-template" id="week-template">
+        <div class="wrapper"></div>
+
+    </div>
+
+     <script type="text/x-handlebars-template" id="week-template">
         <div class="week">
             <!--Заголовки днів-->
             <table class="grid-table">
@@ -53,6 +64,7 @@
                 <table class="header-table l-events">
                     <tbody>
                     <tr height="1" class="week-full">
+                        <td width="50px"></td>
                         {{#each days}}<td class="day-full" data-index="{{@index}}"><div class="day"></div></td>{{/each}}
                     </tr>
                     </tbody>
@@ -64,7 +76,7 @@
                     <tr height="1">
                         <td width="50px">
                         </td>
-                        <td colspan="7">
+                        <td colspan="{{days.length}}">
                             <div class="hours-wrapper">
                                 <div class="hours">
                                     {{#times 24}}<div class="hour-line"><div class="half"></div></div>{{/times}}

@@ -71,14 +71,26 @@ function selectWeek(date) {
 }
 
 $('.left-week-button').on('click', () => {
-	weekView.moveBaseDate(-7);
+	if (viewMode === 'week') {
+		weekView.moveBaseDate(-7);
+	} else {
+		if (viewMode === 'day') {
+			weekView.moveBaseDate(-1);
+		}
+	}
 	weekView.renderGrid();
 	weekView.renderWeekEvents();
 	weekView.renderLongWeekEvents();
 });
 
 $('.right-week-button').on('click', () => {
-	weekView.moveBaseDate(7);
+	if (viewMode === 'week') {
+		weekView.moveBaseDate(7);
+	} else {
+		if (viewMode === 'day') {
+			weekView.moveBaseDate(1);
+		}
+	}
 	weekView.renderGrid();
 	weekView.renderWeekEvents();
 	weekView.renderLongWeekEvents();
@@ -233,3 +245,22 @@ $('body').on('mouseup', function (event) {
 });
 
 /*******************************************/
+
+$('.scale .btn').on('click', function() {
+
+	$('.scale .btn').removeClass('selected');
+
+	viewMode = $(this).data('period');
+	switch (viewMode) {
+		case 'day':
+			weekView.setDaysCount(1);
+			break;
+		case 'week':
+			weekView.setBaseDate( moment(weekView.getBaseDate()).startOf('week') );
+			weekView.setDaysCount(7);
+			break;
+	}
+
+	$(this).addClass('selected');
+
+});

@@ -20,9 +20,6 @@ aside {
   width: 200px;
   float: left;
   text-align: center;
-  #create-event {
-    margin: 10px 0 0;
-  }
 }
 
 #week-placeholder {
@@ -148,7 +145,7 @@ table.grid-table {
 
 .long-wrapper {
   position: relative;
-  margin-left: 50px;
+  //margin-left: 50px;
   .long-events {
     position: relative;
     .long-event {
@@ -179,6 +176,34 @@ table.grid-table {
       padding: 0;
       &.selected-day {
         background-color: rgba(0, 0, 255, 0.3);
+      }
+    }
+  }
+}
+
+#create-event {
+  float: left;
+  margin: 10px 50px 0;
+}
+
+.scale {
+  float: left;
+  margin-top: 10px;
+  margin-left: 50px;
+  .btn-group {
+    font-size: 0;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+    .btn {
+      border-radius: 0;
+      box-shadow: none;
+      &:first-child {
+        border-radius: 3px 0 0 3px;
+      }
+      &:last-child {
+        border-radius: 0 3px 3px 0;
+      }
+      &.selected {
+        background-color: #2bbbad;
       }
     }
   }
