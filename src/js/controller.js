@@ -31,6 +31,7 @@ $('#create-event-ok').on('click', (event) => {
 			});
 		}
 		weekView.renderWeekEvents();
+		weekView.renderLongWeekEvents();
 	}
 });
 
@@ -39,6 +40,7 @@ $('#delete-event').on('click', () => {
 	if (form.elements.id && form.elements.id.value) {
 		eventList.deleteEvent(form.elements.id.value);
 		weekView.renderWeekEvents();
+		weekView.renderLongWeekEvents();
 	}
 });
 
@@ -47,7 +49,7 @@ $('#export-event').on('click', () => {
 	eventList.getEvent(form.elements.id.value).exportEvent();
 });
 
-$('#week-placeholder').on('click', '.event', function() {
+$('#week-placeholder').on('click', '.event, .long-event', function() {
 	let eventId = $(this).data('id');
 	let event = eventList.getEvent(eventId);
 	let form = $('#editevent form')[0];
@@ -65,18 +67,21 @@ function selectWeek(date) {
 	weekView.setBaseDate(baseDate);
 	weekView.renderGrid();
 	weekView.renderWeekEvents();
+	weekView.renderLongWeekEvents();
 }
 
 $('.left-week-button').on('click', () => {
 	weekView.moveBaseDate(-7);
 	weekView.renderGrid();
 	weekView.renderWeekEvents();
+	weekView.renderLongWeekEvents();
 });
 
 $('.right-week-button').on('click', () => {
 	weekView.moveBaseDate(7);
 	weekView.renderGrid();
 	weekView.renderWeekEvents();
+	weekView.renderLongWeekEvents();
 });
 
 /*******************************************/
@@ -84,10 +89,12 @@ $('.right-week-button').on('click', () => {
 
 let $timeSelector;
 let timeSelectorTime1, timeSelectorTime2;
-let timeSelectorActive = false;
+let timeSelectorActiveShort = false;
+let timeSelectorActiveLong = false;
+let firstDay, lastDay;
 
 // Почати виділення
-$('#week-placeholder').on('mousedown', '.day-col', function (event) {
+$('#week-placeholder').on('mousedown', '.day-col, .day-full', function (event) {
 
 	// Не продовжувати, якщо клік по блоку події
 	if ($(event.target).hasClass('event') || $(event.target).closest('.event').length) return;
@@ -95,48 +102,73 @@ $('#week-placeholder').on('mousedown', '.day-col', function (event) {
 	// Відстежувати переміщення якщо натиснута ліва кнопка миші
 	if (event.buttons === 1) {
 
-		timeSelectorActive = true;
-		// Визначити координату міши відносно колонки дня
-		let yCoord = event.clientY - $(this).offset().top + $(window).scrollTop();
+		if ($(this).hasClass('day-col')) {
+			// Для коротких подій
 
-		// Визначити час, що відповідає позиції миші
-		timeSelectorTime1 = timeSelectorTime2 = Math.floor(yCoord / $(this).height() * 24 * 2) / 2;
+			timeSelectorActiveShort = true;
 
-		// Створити блок вибору діапазону часу
-		if ($timeSelector) $timeSelector.remove();
-		$timeSelector = $('<div>');
-		$(this).append($timeSelector);
-		$timeSelector.css({
-			top: timeSelectorTime1 * $(this).height() / 24,
-			height: 0.5 * $(this).height() / 24,
-		}).addClass('time-selector');
+			// Визначити координату міши відносно колонки дня
+			let yCoord = event.clientY - $(this).offset().top + $(window).scrollTop();
+
+			// Визначити час, що відповідає позиції миші
+			timeSelectorTime1 = timeSelectorTime2 = Math.floor(yCoord / $(this).height() * 24 * 2) / 2;
+
+			// Визначити день
+			firstDay = $(this).data('index');
+
+			// Створити блок вибору діапазону часу
+			if ($timeSelector) $timeSelector.remove();
+			$timeSelector = $('<div>');
+			$(this).append($timeSelector);
+			$timeSelector.css({
+				top: timeSelectorTime1 * $(this).height() / 24,
+				height: 0.5 * $(this).height() / 24,
+			}).addClass('time-selector');
+
+		} else {
+			// Для довгих подій
+
+			timeSelectorActiveLong = true;
+			firstDay = lastDay = $(this).data('day-index');
+			weekView.updateFullDaySelection(firstDay, lastDay);
+		}
 
 	}
 });
 
 // Виділення діапазону при переміщенні вказівника миші
-$('#week-placeholder').on('mousemove', '.day-col', function (event) {
+$('#week-placeholder').on('mousemove', '.s-events .day-col, .l-events .day-full', function (event) {
 
 	// Відстежувати переміщення якщо натиснута ліва кнопка миші
 	if (event.buttons === 1) {
 
-		// Визначити координату міши відносно колонки дня
-		let yCoord = event.clientY - $(this).offset().top + $(window).scrollTop();
+		if ($(this).hasClass('day-col') && timeSelectorActiveShort) {
 
-		// Визначити час, що відповідає позиції миші
-		timeSelectorTime2 = Math.floor(yCoord / $(this).height() * 24 * 2) / 2;
+			// Визначити координату міши відносно колонки дня
+			let yCoord = event.clientY - $(this).offset().top + $(window).scrollTop();
 
-		// Визначити діапазон, але не менше 0.5 години
-		let t1 = Math.min(timeSelectorTime1, timeSelectorTime2);
-		let t2 = Math.max(timeSelectorTime1, timeSelectorTime2);
-		let delta = t2 - t1 + 0.5;
+			// Визначити час, що відповідає позиції миші
+			timeSelectorTime2 = Math.floor(yCoord / $(this).height() * 24 * 2) / 2;
 
-		// Оновити позицію блока виділення
-		if ($timeSelector) {
-			$timeSelector.css({
-				top: t1 * $(this).height() / 24,
-				height: delta * $(this).height() / 24,
-			});
+			// Визначити діапазон, але не менше 0.5 години
+			let t1 = Math.min(timeSelectorTime1, timeSelectorTime2);
+			let t2 = Math.max(timeSelectorTime1, timeSelectorTime2);
+			let delta = t2 - t1 + 0.5;
+
+			// Оновити позицію блока виділення
+			if ($timeSelector) {
+				$timeSelector.css({
+					top: t1 * $(this).height() / 24,
+					height: delta * $(this).height() / 24,
+				});
+			}
+
+		}
+
+		if ($(this).hasClass('day-full') && timeSelectorActiveLong) {
+			let dayIndex = $(this).data('day-index');
+			if (dayIndex) lastDay = dayIndex;
+			weekView.updateFullDaySelection(firstDay, lastDay);
 		}
 
 	}
@@ -144,36 +176,60 @@ $('#week-placeholder').on('mousemove', '.day-col', function (event) {
 });
 
 // Коли кнопку миші відпустили - закінчити виділення та створити подію
-$('#week-placeholder').on('mouseup', '.day-col', function (event) {
+$('body').on('mouseup', function (event) {
 
-	// Якщо не в режимі вибору, то вийти
-	if (!timeSelectorActive) return;
+	if (timeSelectorActiveShort) {
 
-	timeSelectorActive = false;
-	let form = $('#editevent form')[0];
-	let selectedDay = moment(weekView.getBaseDate()).add($(this).data('index'), 'days');
+		timeSelectorActiveShort = false;
+		let form = $('#editevent form')[0];
+		// let selectedDay = moment(weekView.getBaseDate()).add($(this).data('index'), 'days');
 
-	// Визначити, котрий час більший, а котрий менший, та забезпечити мінімальний діапазон 0.5 години
-	let t1 = Math.min(timeSelectorTime1, timeSelectorTime2);
-	let t2 = Math.max(timeSelectorTime1, timeSelectorTime2)+0.5;
+		// Визначити, котрий час більший, а котрий менший, та забезпечити мінімальний діапазон 0.5 години
+		let t1 = Math.min(timeSelectorTime1, timeSelectorTime2);
+		let t2 = Math.max(timeSelectorTime1, timeSelectorTime2) + 0.5;
 
-	// Сформувати час початку події
-	let hr = Math.round(t1);
-	let min = (t1 - hr) * 60;
-	form.elements.date1.value = selectedDay.hour(hr).minute(min).format('YYYY-MM-DDTHH:mm');
+		let day = moment(weekView.getBaseDate()).add(firstDay, 'days');
 
-	// Сформувати час закінчення події
-	hr = Math.round(t2);
-	min = (t2 - hr) * 60;
-	form.elements.date2.value = selectedDay.hour(hr).minute(min).format('YYYY-MM-DDTHH:mm');
+		// Сформувати час початку події
+		let hr = Math.round(t1);
+		let min = (t1 - hr) * 60;
+		form.elements.date1.value = day.set({hour: hr, minute: min}).format('YYYY-MM-DDTHH:mm');
 
-	form.elements.desc.value = '';
-	form.elements.id.value = '';
+		// Сформувати час закінчення події
+		hr = Math.round(t2);
+		min = (t2 - hr) * 60;
+		form.elements.date2.value = day.set({hour: hr, minute: min}).format('YYYY-MM-DDTHH:mm');
 
-	// Відкрити вікно створення події
-	$('#delete-event, #export-event').addClass('disabled');
-	$('#editevent').modal('open');
+		form.elements.desc.value = '';
+		form.elements.id.value = '';
 
+		// Відкрити вікно створення події
+		$('#delete-event, #export-event').addClass('disabled');
+		$('#editevent').modal('open');
+	}
+
+	if (timeSelectorActiveLong) {
+
+		timeSelectorActiveLong = false;
+		let form = $('#editevent form')[0];
+
+		// Визначити, котрий день більший, а котрий менший
+		let d1 = Math.min(firstDay, lastDay);
+		let d2 = Math.max(firstDay, lastDay);
+
+		// Сформувати час початку події
+		form.elements.date1.value = moment(weekView.getBaseDate()).add(d1, 'days').format('YYYY-MM-DDTHH:mm');
+
+		// Сформувати час закінчення події
+		form.elements.date2.value = moment(weekView.getBaseDate()).add(d2, 'days').set({hour: 23, minute: 59}).format('YYYY-MM-DDTHH:mm');
+
+		form.elements.desc.value = '';
+		form.elements.id.value = '';
+
+		// Відкрити вікно створення події
+		$('#delete-event, #export-event').addClass('disabled');
+		$('#editevent').modal('open');
+	}
 });
 
 /*******************************************/

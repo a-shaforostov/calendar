@@ -36,17 +36,30 @@
 
     <script type="text/x-handlebars-template" id="week-template">
         <div class="week">
+            <!--Заголовки днів-->
             <table class="grid-table">
                 <thead>
-                    <tr>
-                        <td width="50px"></td>
-                        {{#each days}}
-                        <td class="day-col">{{this}}</td>
-                        {{/each}}
-                    </tr>
+                <tr class="day-captions">
+                    <td width="50px"></td>
+                    {{#each days}}
+                    <td class="day-col">{{this}}</td>
+                    {{/each}}
+                </tr>
                 </thead>
             </table>
-            <table class="grid-table">
+            <!--Поле для довгих подій-->
+            <div class="long-wrapper">
+                <div class="long-events"></div>
+                <table class="header-table l-events">
+                    <tbody>
+                    <tr height="1" class="week-full">
+                        {{#each days}}<td class="day-full" data-index="{{@index}}"><div class="day"></div></td>{{/each}}
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--Поле для коротких подій-->
+            <table class="grid-table s-events">
                 <tbody>
                     <tr height="1">
                         <td width="50px">

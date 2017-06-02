@@ -36,7 +36,7 @@ class EventsList {
 		localStorage.setItem('event-' + event.id, JSON.stringify(event));
 
 		// Нотифікация
-		let timediff = moment(moment(begin).diff(moment(new Date())));
+		let timediff = moment.duration(moment(begin).diff(moment(new Date())));
 		if (timediff > 0) {
 			event.timer = setTimeout(function () {
 				showNotification('Починається подія ', {body: desc, icon: '../images/alarm-clock.png'});
@@ -57,7 +57,7 @@ class EventsList {
 		localStorage.setItem('event-' + id, JSON.stringify(event));
 
 		// Нотифікация
-		let timediff = moment(moment(begin).diff(moment(new Date())));
+		let timediff = moment.duration(moment(begin).diff(moment(new Date())));
 		if (timediff > 0) {
 			event.timer = setTimeout(function () {
 				showNotification('Починається подія ', {body: desc, icon: 'images/alarm-clock.png'});
@@ -78,6 +78,7 @@ class EventsList {
 		delete this.events[id];
 	}
 
+	// Повернути короткі події за день, сортування за зростанням часу початку
 	getEventsByDay(date) {
 		let eventsByDate = {};
 		$.each(this.events, (index, item) => {
@@ -88,6 +89,23 @@ class EventsList {
 		return _.sortBy(eventsByDate, 'begin');
 	}
 
+	// Повернути довгі події що зачіпають тиждень, сортування за зростанням дати початку
+	getEventsOfWeek(date) {
+		let startOfWeek = _.cloneDeep(date);
+		let endOfWeek = _.cloneDeep(date);
+		endOfWeek.add(6, 'days');
+
+		let eventsOfWeek = {};
+		$.each(this.events, (index, item) => {
+			let beginFits = moment(item.begin).isSameOrBefore(endOfWeek, 'day');
+			let endFits = moment(item.end).isSameOrAfter(startOfWeek, 'day');
+			let datesIsSame = item.begin.isSame(item.end, 'day');
+			if (!datesIsSame && beginFits && endFits) {
+				eventsOfWeek[index] = item;
+			}
+		});
+		return _.sortBy(eventsOfWeek, 'begin');
+	}
 }
 
 // Завантажити події local storage
@@ -153,4 +171,5 @@ for (let i = 0; i < localStorage.length; i++) {
 let weekView = new WeekView(moment().startOf('week'));
 weekView.renderGrid();
 weekView.renderWeekEvents();
+weekView.renderLongWeekEvents();
 
