@@ -87,7 +87,7 @@ class WeekView {
 
 	renderDayEvents(date) {
 
-		let dayElement = $('tbody .day-col')[moment(date).weekday()];
+		let dayElement = $('tbody .day-col .day')[moment(date).weekday()];
 		$(dayElement).html('');
 		let data = this.arrangeDayEvents( eventList.getEventsByDay(date) );
 		for (let i = 0; i < data.length; i++) {

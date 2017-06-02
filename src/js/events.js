@@ -65,6 +65,26 @@ class EventsList {
 		}
 	}
 
+	loadEvents(){
+		// Завантажити події local storage
+		let loadedEvents = [];
+		let lsKeys = Object.keys(localStorage);
+		lsKeys.forEach((keyName) => {
+			// Події збережені з префіксом event-
+			if (keyName.substr(0, 6) === 'event-') {
+				let event = JSON.parse(localStorage.getItem(keyName));
+				// Додаємо подію в масив
+				loadedEvents.push(event);
+				// Видаляємо подію зі сховища та створюємо ії в колекції (для оновлення id)
+				localStorage.removeItem(keyName);
+			}
+		});
+		// Сформувати події з переприсвоєнням індексів
+		loadedEvents.forEach((event) => {
+			this.addEvent(event);
+		});
+	}
+
 	getEvent(id) {
 		return this.events[id];
 	}
@@ -86,7 +106,7 @@ class EventsList {
 				eventsByDate[index] = item;
 			}
 		});
-		return _.sortBy(eventsByDate, 'begin');
+		return _.sortBy(eventsByDate, ['begin', 'end', 'desc']);
 	}
 
 	// Повернути довгі події що зачіпають тиждень, сортування за зростанням дати початку
@@ -104,21 +124,13 @@ class EventsList {
 				eventsOfWeek[index] = item;
 			}
 		});
-		return _.sortBy(eventsOfWeek, 'begin');
+		return _.sortBy(eventsOfWeek, ['begin', 'end', 'desc']);
 	}
 }
 
-// Завантажити події local storage
+// Створити список подій і завантажити події
 let eventList = new EventsList();
-for (let i = 0; i < localStorage.length; i++) {
-	let keyName = localStorage.key(i);
-	if (keyName.substr(0, 6) === 'event-') {
-		let event = JSON.parse(localStorage.getItem(keyName));
-		// Видаляємо подію зі сховища та створюємо ії в колекції (для оновлення id)
-		localStorage.removeItem(keyName);
-		eventList.addEvent(event);
-	}
-}
+eventList.loadEvents();
 
 // test
 // let events = [
