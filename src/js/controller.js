@@ -1,5 +1,17 @@
 /* global eventList, moment, weekView, Materialize */
 
+const viewModesList = ['day', 'week', 'month', 'year'];
+let viewMode = 'week';
+
+// Створити список подій і завантажити події
+let eventList = new EventsList();
+eventList.loadEvents();
+
+// Створити представлення
+let view = new DayView(moment().startOf('week'));
+view.renderView();
+
+
 $('#create-event').on('click', () => {
 	let form = $('#editevent form')[0];
 	form.elements.date1.value = moment().format('YYYY-MM-DDTHH:mm');
@@ -30,8 +42,7 @@ $('#create-event-ok').on('click', (event) => {
 				desc: form.elements.desc.value,
 			});
 		}
-		weekView.renderWeekEvents();
-		weekView.renderLongWeekEvents();
+		view.renderView();
 	}
 });
 
@@ -39,8 +50,7 @@ $('#delete-event').on('click', () => {
 	let form = $('#editevent form')[0];
 	if (form.elements.id && form.elements.id.value) {
 		eventList.deleteEvent(form.elements.id.value);
-		weekView.renderWeekEvents();
-		weekView.renderLongWeekEvents();
+		view.renderView();
 	}
 });
 
@@ -49,7 +59,7 @@ $('#export-event').on('click', () => {
 	eventList.getEvent(form.elements.id.value).exportEvent();
 });
 
-$('#week-placeholder').on('click', '.event, .long-event', function() {
+$('body').on('click', '#month-placeholder .event-item, #week-placeholder .event, #week-placeholder .long-event', function() {
 	let eventId = $(this).data('id');
 	let event = eventList.getEvent(eventId);
 	let form = $('#editevent form')[0];
@@ -62,38 +72,72 @@ $('#week-placeholder').on('click', '.event, .long-event', function() {
 	Materialize.updateTextFields();
 });
 
+// Створити нову подію за вказаний на місячному календарі день
+$('#month-placeholder').on('click', '.day-block', function(event) {
+	if ($(event.target).hasClass('day-block') || $(event.target).hasClass('day-wrapper')) {
+		let date = $(this).find('.date-number a').data('date');
+		let form = $('#editevent form')[0];
+		form.elements.date1.value = moment(date).set({hour: 0, minute: 0}).format('YYYY-MM-DDTHH:mm');
+		form.elements.date2.value = moment(date).set({hour: 23, minute: 59}).format('YYYY-MM-DDTHH:mm');
+		form.elements.desc.value = '';
+		$('#delete-event, #export-event').addClass('disabled');
+		$('#editevent').modal('open');
+	}
+});
+
 function selectWeek(date) {
 	let baseDate = moment(date).startOf('week');
-	weekView.setBaseDate(baseDate);
-	weekView.renderGrid();
-	weekView.renderWeekEvents();
-	weekView.renderLongWeekEvents();
+	view.setBaseDate(baseDate);
+	view.renderView();
 }
 
 $('.left-week-button').on('click', () => {
 	if (viewMode === 'week') {
-		weekView.moveBaseDate(-7);
+		view.moveBaseDate(-7);
 	} else {
 		if (viewMode === 'day') {
-			weekView.moveBaseDate(-1);
+			view.moveBaseDate(-1);
+		} else {
+			if (viewMode === 'month') {
+				view.setBaseDate(moment(view.getBaseDate()).subtract(1, 'month'));
+				view.renderView();
+			}
 		}
 	}
-	weekView.renderGrid();
-	weekView.renderWeekEvents();
-	weekView.renderLongWeekEvents();
+	view.renderView();
 });
 
 $('.right-week-button').on('click', () => {
 	if (viewMode === 'week') {
-		weekView.moveBaseDate(7);
+		view.moveBaseDate(7);
 	} else {
 		if (viewMode === 'day') {
-			weekView.moveBaseDate(1);
+			view.moveBaseDate(1);
+		} else {
+			if (viewMode === 'month') {
+				view.setBaseDate(moment(view.getBaseDate()).add(1, 'month'));
+				view.renderView();
+			}
 		}
 	}
-	weekView.renderGrid();
-	weekView.renderWeekEvents();
-	weekView.renderLongWeekEvents();
+	view.renderView();
+});
+
+$('#month-placeholder').on('click', '.date-number a', function(event) {
+	event.preventDefault();
+
+	let date = $(this).data('date');
+
+	$('.scale .btn').removeClass('selected');
+	$('.view-content').html('');
+
+	viewMode = 'day';
+	view = new DayView(moment(date));
+	view.setDaysCount(1);
+	view.renderView();
+
+	$('.scale .btn[data-period="day"]').addClass('selected');
+
 });
 
 /*******************************************/
@@ -142,7 +186,7 @@ $('#week-placeholder').on('mousedown', '.day-col, .day-full', function (event) {
 
 			timeSelectorActiveLong = true;
 			firstDay = lastDay = $(this).data('day-index');
-			weekView.updateFullDaySelection(firstDay, lastDay);
+			view.updateFullDaySelection(firstDay, lastDay);
 		}
 
 	}
@@ -180,7 +224,7 @@ $('#week-placeholder').on('mousemove', '.s-events .day-col, .l-events .day-full'
 		if ($(this).hasClass('day-full') && timeSelectorActiveLong) {
 			let dayIndex = $(this).data('day-index');
 			if (dayIndex) lastDay = dayIndex;
-			weekView.updateFullDaySelection(firstDay, lastDay);
+			view.updateFullDaySelection(firstDay, lastDay);
 		}
 
 	}
@@ -194,13 +238,13 @@ $('body').on('mouseup', function (event) {
 
 		timeSelectorActiveShort = false;
 		let form = $('#editevent form')[0];
-		// let selectedDay = moment(weekView.getBaseDate()).add($(this).data('index'), 'days');
+		// let selectedDay = moment(view.getBaseDate()).add($(this).data('index'), 'days');
 
 		// Визначити, котрий час більший, а котрий менший, та забезпечити мінімальний діапазон 0.5 години
 		let t1 = Math.min(timeSelectorTime1, timeSelectorTime2);
 		let t2 = Math.max(timeSelectorTime1, timeSelectorTime2) + 0.5;
 
-		let day = moment(weekView.getBaseDate()).add(firstDay, 'days');
+		let day = moment(view.getBaseDate()).add(firstDay, 'days');
 
 		// Сформувати час початку події
 		let hr = Math.round(t1);
@@ -230,10 +274,10 @@ $('body').on('mouseup', function (event) {
 		let d2 = Math.max(firstDay, lastDay);
 
 		// Сформувати час початку події
-		form.elements.date1.value = moment(weekView.getBaseDate()).add(d1, 'days').format('YYYY-MM-DDTHH:mm');
+		form.elements.date1.value = moment(view.getBaseDate()).add(d1, 'days').format('YYYY-MM-DDTHH:mm');
 
 		// Сформувати час закінчення події
-		form.elements.date2.value = moment(weekView.getBaseDate()).add(d2, 'days').set({hour: 23, minute: 59}).format('YYYY-MM-DDTHH:mm');
+		form.elements.date2.value = moment(view.getBaseDate()).add(d2, 'days').set({hour: 23, minute: 59}).format('YYYY-MM-DDTHH:mm');
 
 		form.elements.desc.value = '';
 		form.elements.id.value = '';
@@ -249,18 +293,47 @@ $('body').on('mouseup', function (event) {
 $('.scale .btn').on('click', function() {
 
 	$('.scale .btn').removeClass('selected');
+	$('.view-content').html('');
 
 	viewMode = $(this).data('period');
 	switch (viewMode) {
 		case 'day':
-			weekView.setDaysCount(1);
+			view = new DayView(view.getBaseDate());
+			view.setDaysCount(1);
 			break;
 		case 'week':
-			weekView.setBaseDate( moment(weekView.getBaseDate()).startOf('week') );
-			weekView.setDaysCount(7);
+			view = new DayView(view.getBaseDate().startOf('week'));
+			view.setDaysCount(7);
+			break;
+		case 'month':
+			view = new MonthView(view.getBaseDate());
+			break;
+		case 'year':
+			view = new YearView(view.getBaseDate());
 			break;
 	}
+	view.renderView();
 
 	$(this).addClass('selected');
 
+});
+
+$('#editevent').modal({
+	complete: () => {
+		if ($timeSelector) $timeSelector.remove();
+		$('.day-full').removeClass('selected-day');
+	}
+});
+
+$.datetimepicker.setLocale('uk');
+$('.date-picker-inline').datetimepicker({
+	format: 'd.m.Y',
+	inline: true,
+	lang: 'uk',
+	timepicker: false,
+	defaultDate: new Date(),
+	dayOfWeekStart: 1,
+	onSelectDate: function(ct) {
+		selectWeek(ct);
+	},
 });

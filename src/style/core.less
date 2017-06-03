@@ -2,8 +2,17 @@ html {
   font-family: Arial, sans-serif;
 }
 
+body {
+  width: calc(~"100vw - 20px") !important;
+  padding: 20px;
+}
+
 input[type="datetime-local"] {
   height: inherit;
+}
+
+.btn:focus {
+  background-color: #2ab7a9;
 }
 
 .noselect {
@@ -22,15 +31,11 @@ aside {
   text-align: center;
 }
 
-#week-placeholder {
-  margin-left: 200px;
-}
-
 .event {
   position: absolute;
   box-sizing: border-box;
   background-color: lightgreen;
-  border: 1px solid black;
+  border: 1px solid #5C935C;
   padding: 3px 5px;
   font-size: 0.8rem;
   word-wrap: break-word;
@@ -59,14 +64,17 @@ table.grid-table {
   width: 100%;
   border-collapse: collapse;
   .day-captions {
-      border: 1px solid rgba(0,0,0,0);
+    border: 1px solid rgba(0,0,0,0);
+    .day-col {
+      font-weight: bold;
+    }
   }
   td {
     padding: 0;
   }
   thead tr td {
     text-align: center;
-    font-weight: 400;
+    font-weight: bold;
   }
   tbody {
     .hours-wrapper {
@@ -133,12 +141,24 @@ table.grid-table {
 
 .header {
   height: 60px;
-  margin-left: 200px;
+  //margin-left: 200px;
+  min-width: 420px;
   .nav-block {
     float: left;
     margin-top: 10px;
+    width: 350px;
+    background-color: rgba(43, 187, 173, 0.31);
+    text-align: center;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12), 0 3px 1px -2px rgba(0,0,0,.2);
+    .left-week-button {
+      float: left;
+    }
     .week-number {
-
+      line-height: 35px;
+      font-size: 20px;
+    }
+    .right-week-button {
+      float: right;
     }
   }
 }
@@ -207,4 +227,125 @@ table.grid-table {
       }
     }
   }
+}
+
+#month-placeholder {
+  table {
+    table-layout: fixed;
+  }
+  thead tr td {
+    text-align: center;
+  }
+  tbody tr td {
+    position: relative;
+    padding: 5px;
+    width: 14.286%;
+  }
+  .month-day-caption {
+    padding-bottom: 5px;
+    font-weight: bold;
+  }
+  .day-block {
+    border: 1px solid lightgrey;
+    height: 125px;
+    min-width: 140px;
+    overflow: hidden;
+    background-color: white;
+    .day-wrapper {
+      margin: 10px;
+      height: calc(~"100% - 20px");
+      overflow-y: hidden;
+    }
+    &.alien {
+      background-color: lightgrey;
+    }
+    .day-header {
+      position: relative;
+      .date-number {
+        display: inline-block;
+        font-size: 2rem;
+        transition: 400ms;
+        position: absolute;
+      }
+    }
+    .badge {
+      cursor: default;
+      opacity: 1;
+      transition: 400ms;
+    }
+    ul {
+      height: 40px;
+      margin-bottom: 0;
+      margin-top: 60px;
+      .event-item {
+        background-color: #90ee90;
+        border: 1px solid #5C935C;
+        padding: 3px 5px;
+        font-size: .8rem;
+        margin-top: -1px;
+        line-height: 14px;
+        cursor: default;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        &:first-child {
+          margin-top: 0;
+        }
+        .time {
+          font-weight: bold;
+          font-size: 0.8rem;
+        }
+        //.desc {
+        //  white-space: nowrap;
+        //  text-overflow: ellipsis;
+        //
+        //}
+      }
+    }
+    &:hover {
+      position: absolute;
+      height: inherit;
+      top: 0;
+      right: 0;
+      left: 0;
+      margin: 5px;
+      min-height: 125px;
+      z-index: 10;
+      background-color: antiquewhite;
+      .badge {
+        opacity: 0;
+      }
+      .date-number {
+        font-size: 3rem;
+        margin-top: -11px;
+      }
+      ul {
+        overflow-y: auto;
+        height: inherit;
+        max-height: 200px;
+      }
+    }
+  }
+}
+
+#year-placeholder {
+  .month {
+    width: 360px;
+    float: left;
+    border: 1px solid #d3d3d3;
+    margin: 20px;
+    height: 230px;
+    td {
+      text-align: center;
+      border-radius: 0;
+      padding: 5px;
+    }
+    thead .holiday {
+      background-color: rgba(255, 108, 108, 0.28);
+    }
+    tbody .holiday .date-number a {
+      color: red;
+    }
+  }
+
 }

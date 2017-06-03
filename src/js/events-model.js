@@ -29,6 +29,8 @@ class EventsList {
 		// Якщо кінець періода припадає на початок доби - зменшити період на хвилину
 		if (moment(end).format('HHmmss') === '000000') end = moment(end).subtract(1, 'minute');
 		let event = new Event(begin, end, desc);
+		event.beginText = event.begin.format('HH:mm');
+		event.endText = event.end.format('HH:mm');
 		event.id = this.eventIdCounter;
 		this.events[this.eventIdCounter] = event;
 
@@ -49,7 +51,9 @@ class EventsList {
 		if (moment(end).format('HHmmss') === '000000') end = moment(end).subtract(1, 'minute');
 		let event = this.events[id];
 		event.begin = begin;
+		event.beginText = event.begin.format('HH:mm');
 		event.end = end;
+		event.endText = event.end.format('HH:mm');
 		event.desc = desc;
 		if (event.timer) clearTimeout(event.timer);
 
@@ -99,10 +103,14 @@ class EventsList {
 	}
 
 	// Повернути короткі події за день, сортування за зростанням часу початку
-	getEventsByDay(date) {
+	getEventsByDay(date, all) {
 		let eventsByDate = {};
 		$.each(this.events, (index, item) => {
-			if (moment(date).isSame(item.begin, 'day') && moment(date).isSame(item.end, 'day')) {
+			if (
+				// Всі події за вказану дату
+				(all && moment(date).isBetween(item.begin, item.end, 'day', '[]')) ||
+				// Тільки одноденні
+				(moment(date).isSame(item.begin, 'day') && moment(date).isSame(item.end, 'day')) ) {
 				eventsByDate[index] = item;
 			}
 		});
@@ -110,10 +118,10 @@ class EventsList {
 	}
 
 	// Повернути довгі події що зачіпають тиждень, сортування за зростанням дати початку
-	getEventsOfWeek(date) {
+	getEventsOfWeek(date, daysCount) {
 		let startOfWeek = _.cloneDeep(date);
 		let endOfWeek = _.cloneDeep(date);
-		endOfWeek.add(6, 'days');
+		endOfWeek.add(daysCount-1, 'days');
 
 		let eventsOfWeek = {};
 		$.each(this.events, (index, item) => {
@@ -126,11 +134,8 @@ class EventsList {
 		});
 		return _.sortBy(eventsOfWeek, ['begin', 'end', 'desc']);
 	}
-}
 
-// Створити список подій і завантажити події
-let eventList = new EventsList();
-eventList.loadEvents();
+}
 
 // test
 // let events = [
@@ -180,8 +185,4 @@ eventList.loadEvents();
 // 	eventList.addEvent(item);
 // });
 
-let weekView = new WeekView(moment().startOf('week'));
-weekView.renderGrid();
-weekView.renderWeekEvents();
-weekView.renderLongWeekEvents();
 

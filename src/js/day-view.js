@@ -1,8 +1,6 @@
 /* global moment, _, eventList, Handlebars, WeekView, selectWeek */
 
-let viewMode = 'week';
-
-class WeekView {
+class DayView {
 
 	constructor(baseDate) {
 		this.baseDate = baseDate;
@@ -13,7 +11,7 @@ class WeekView {
 		this.baseDate = baseDate;
 	}
 
-	getBaseDate(baseDate) {
+	getBaseDate() {
 		return this.baseDate;
 	}
 
@@ -23,9 +21,6 @@ class WeekView {
 	
 	setDaysCount(count) {
 		this.daysCount = count;
-		weekView.renderGrid();
-		weekView.renderWeekEvents();
-		weekView.renderLongWeekEvents();
 	}
 
 	arrangeDayEvents(plainArray) {
@@ -138,14 +133,6 @@ class WeekView {
 
 	}
 
-	renderWeekEvents() {
-		let currentDay = _.cloneDeep(this.baseDate);
-		for (let days = 0; days < this.daysCount; days++) {
-			this.renderDayEvents(currentDay);
-			currentDay.add(1, 'days');
-		}
-	}
-
 	renderGrid() {
 		let $place = $('#week-placeholder');
 		let source = document.getElementById('week-template').innerHTML;
@@ -170,12 +157,20 @@ class WeekView {
 		$('.header .nav-block .week-number').text(text);
 	}
 
-	renderLongWeekEvents() {
+	renderShortEvents() {
+		let currentDay = _.cloneDeep(this.baseDate);
+		for (let days = 0; days < this.daysCount; days++) {
+			this.renderDayEvents(currentDay);
+			currentDay.add(1, 'days');
+		}
+	}
+
+	renderLongEvents() {
 		let startOfWeek = _.cloneDeep(this.baseDate);
 		let endOfWeek = _.cloneDeep(this.baseDate);
 		endOfWeek.add(this.daysCount-1, 'days');
 		// Сформувати набір подій
-		let events = eventList.getEventsOfWeek(startOfWeek);
+		let events = eventList.getEventsOfWeek(startOfWeek, this.daysCount);
 		let entities = [];
 		let array2d = [new Array(this.daysCount).fill(false)];
 		let maxRow = 0;
@@ -257,16 +252,6 @@ class WeekView {
 		});
 
 		// Сформувати сітку багатоденних подій
-		// let tds = new Array(7+1).join('<td class="day-full"></td>');
-		// let trs = new Array(entities.length+2).join('<tr class="week-full">' + tds + '</tr>');
-		// let $tableContent = $(trs);
-		// $tableContent.each((index, item) => {
-		// 	$(item).find('.day-full').each((index1, item1) => {
-		// 		$(item1).data('day-index', index1);
-		// 		console.log($(item1).data('day-index'));
-		// 	});
-		// });
-		// $('.header-table tbody').html($tableContent);
 		let tds = '<td width="50px"></td>' + new Array(this.daysCount+1).join('<td class="day-full"></td>');
 		let $tableContent = $('<tr class="week-full">' + tds + '</tr>');
 		$tableContent.find('.day-full').each((index, item) => {
@@ -276,6 +261,12 @@ class WeekView {
 		$tableContent.css('height', ++maxRow * 20 + 10);
 		$('.header-table tbody').html($tableContent);
 
+	}
+
+	renderView() {
+		this.renderGrid();
+		this.renderShortEvents();
+		this.renderLongEvents();
 	}
 
 	updateFullDaySelection(firstDay, lastDay) {
@@ -289,22 +280,3 @@ class WeekView {
 	}
 }
 
-$('#editevent').modal({
-	complete: () => {
-		if ($timeSelector) $timeSelector.remove();
-		$('.day-full').removeClass('selected-day');
-	}
-});
-
-$.datetimepicker.setLocale('uk');
-$('.date-picker-inline').datetimepicker({
-	format: 'd.m.Y',
-	inline: true,
-	lang: 'uk',
-	timepicker: false,
-	defaultDate: new Date(),
-	dayOfWeekStart: 1,
-	onSelectDate: function(ct) {
-		selectWeek(ct);
-	},
-});

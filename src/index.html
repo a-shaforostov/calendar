@@ -39,7 +39,9 @@
             <!--<input id="month-calendar" class="date-picker-inline">-->
         <!--</aside>-->
 
-        <div id="week-placeholder" class="noselect"></div>
+        <div id="week-placeholder" class="noselect view-content"></div>
+        <div id="month-placeholder" class="noselect view-content"></div>
+        <div id="year-placeholder" class="noselect view-content"></div>
 
         <div class="wrapper"></div>
 
@@ -97,6 +99,74 @@
         </div>
     </script>
 
+    <script type="text/x-handlebars-template" id="month-template">
+        <div class="month">
+            <table>
+                <thead>
+                    <tr>
+                        {{#each daysOfWeek}}<td class="month-day-caption">{{this}}</td>{{/each}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each days}}
+                    <tr>
+                        {{#each this}}
+                        <td>
+                            <div class="day-block {{#if this.alien}}alien{{/if}}" title="Створити подію">
+                                <div class="day-wrapper">
+                                    <div class="day-header">
+                                        <div class="date-number"><a href="#" data-date="{{this.dateText}}" title="Перейти на дату">{{this.day}}</a></div>
+                                        {{#if this.eventCount}}<span class="new badge" data-badge-caption="" title="Кількість подій">+{{this.eventCount}}</span>{{/if}}
+                                    </div>
+                                    <ul>
+                                        {{#each this.events}}
+                                        <li class="event-item" data-id="{{this.id}}" title="Редагувати подію">
+                                            <span class="time">{{this.beginText}}-{{this.endText}}</span>
+                                            <span class="desc">{{this.desc}}</span>
+                                        </li>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        {{/each}}
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </script>
+
+    <script type="text/x-handlebars-template" id="year-template">
+        {{#each months}}
+        <div class="month">
+            <div class="month-name">{{this.monthName}}</div>
+            <table>
+                <thead>
+                    <tr>
+                        {{#each ../daysOfWeek}}<td class="year-day-caption {{#eq @index 5}}holiday{{/eq}}{{#eq @index 6}}holiday{{/eq}}">{{this}}</td>{{/each}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each days}}
+                    <tr>
+                        {{#each this}}
+                        <td class="{{#if holiday}}holiday{{/if}}">
+                            <div class="day-block" title="Перейти на день">
+                                <div class="day-wrapper">
+                                    <div class="date-number"><a href="#" data-date="{{this.dateText}}" title="Перейти на дату">{{this.day}}</a></div>
+                                </div>
+                            </div>
+                        </td>
+                        {{/each}}
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        {{/each}}
+    </script>
+
 
     <!-- Modal Structure -->
     <div id="editevent" class="modal">
@@ -139,9 +209,11 @@
     <script src="vendors/ics.min.js"></script>
     <script src="js/hbs-helpers.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/events-model.js"></script>
+    <script src="js/day-view.js"></script>
+    <script src="js/month-view.js"></script>
+    <script src="js/year-view.js"></script>
     <script src="js/controller.js"></script>
-    <script src="js/view.js"></script>
-    <script src="js/events.js"></script>
     <!--<script>-->
         <!--if('serviceWorker' in navigator) {-->
             <!--navigator.serviceWorker-->

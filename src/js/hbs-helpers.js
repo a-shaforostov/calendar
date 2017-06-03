@@ -21,3 +21,9 @@ Handlebars.registerHelper('for', function(from, to, incr, block) {
 		accum += block.fn(i);
 	return accum;
 });
+
+Handlebars.registerHelper('eq', function(val, val2, block) {
+	if(val == val2){
+		return block.fn(this);
+	}
+});
