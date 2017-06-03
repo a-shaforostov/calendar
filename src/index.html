@@ -7,8 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Calendar</title>
     <link rel="stylesheet" href="vendors/materialize-v0.98.2/css/materialize.min.css">
-    <link rel="stylesheet" href="style/core.css">
     <link rel="stylesheet" href="vendors/datetimepicker/jquery.datetimepicker.min.css">
+    <link rel="stylesheet" href="style/core.css">
 
     <script src="vendors/lodash.min.js"></script>
     <script src="vendors/jquery-3.2.1.min.js"></script>
@@ -16,7 +16,7 @@
     <script src="vendors/moment-with-locales.min.js"></script>
 </head>
 <body>
-    <div class="header">
+    <div class="header clearfix">
         <button class="waves-effect waves-light btn" id="create-event">Додати подію</button>
         <div class="nav-block">
             <button class="left-week-button btn">&lt;</button>
@@ -39,9 +39,9 @@
             <!--<input id="month-calendar" class="date-picker-inline">-->
         <!--</aside>-->
 
-        <div id="week-placeholder" class="noselect view-content"></div>
-        <div id="month-placeholder" class="noselect view-content"></div>
-        <div id="year-placeholder" class="noselect view-content"></div>
+        <div id="week-placeholder" class="noselect view-content clearfix"></div>
+        <div id="month-placeholder" class="noselect view-content clearfix"></div>
+        <div id="year-placeholder" class="noselect view-content clearfix"></div>
 
         <div class="wrapper"></div>
 
@@ -153,7 +153,7 @@
                         {{#each this}}
                         <td class="{{#if holiday}}holiday{{/if}}">
                             <div class="day-block" title="Перейти на день">
-                                <div class="day-wrapper">
+                                <div class="day-wrapper {{#if events}}events{{/if}}">
                                     <div class="date-number"><a href="#" data-date="{{this.dateText}}" title="Перейти на дату">{{this.day}}</a></div>
                                 </div>
                             </div>

@@ -23,7 +23,7 @@ $('#create-event').on('click', () => {
 
 $('#create-event-ok').on('click', (event) => {
 	let form = $('#editevent form')[0];
-	if (!form.checkValidity()) {
+	if (!form.checkValidity() || moment(form.elements.date1.value).isAfter(form.elements.date2.value)) {
 		alert('Не вірно заповнені поля');
 		event.preventDefault();
 		event.stopImmediatePropagation();
@@ -123,7 +123,7 @@ $('.right-week-button').on('click', () => {
 	view.renderView();
 });
 
-$('#month-placeholder').on('click', '.date-number a', function(event) {
+$('#month-placeholder, #year-placeholder').on('click', '.date-number a', function(event) {
 	event.preventDefault();
 
 	let date = $(this).data('date');
@@ -316,6 +316,10 @@ $('.scale .btn').on('click', function() {
 
 	$(this).addClass('selected');
 
+});
+
+$(window).on('resize', () => {
+	if (['day', 'week'].indexOf(viewMode) !== -1) view.renderLongEvents();
 });
 
 $('#editevent').modal({
