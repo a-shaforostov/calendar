@@ -59,7 +59,6 @@ gulp.task('js:build', () => {
         .pipe(development(jsdoc({
             opts: {
                 destination: './documentation-output',
-                // tutorials: './tutorials',
                 template: 'node_modules/jsdoc/templates/default'
             }
         })))

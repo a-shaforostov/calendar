@@ -2,6 +2,19 @@
 /* eslint-disable no-invalid-this */
 
 // Доступні періоди 'day', 'week', 'month', 'year';
+
+/* ІНІЦІАЛІЗАЦІЯ */
+
+moment.locale('uk');
+
+// Модальне вікно редагування події
+$('#editevent').modal({
+	complete: () => {
+		if ($timeSelector) $timeSelector.remove();
+		$('.day-full').removeClass('selected-day');
+	},
+});
+
 // Ініціалізуємо тиждень
 let viewMode = 'week';
 
@@ -14,36 +27,12 @@ let view = new DayView(moment().startOf('week'), 7);
 view.renderView();
 
 
-/* ІНІЦІАЛІЗАЦІЯ ЕЛЕМЕНТІВ */
-
-// Модальне вікно редагування події
-$('#editevent').modal({
-	complete: () => {
-		if ($timeSelector) $timeSelector.remove();
-		$('.day-full').removeClass('selected-day');
-	},
-});
-
-
-// $.datetimepicker.setLocale('uk');
-// $('.date-picker-inline').datetimepicker({
-// 	format: 'd.m.Y',
-// 	inline: true,
-// 	lang: 'uk',
-// 	timepicker: false,
-// 	defaultDate: new Date(),
-// 	dayOfWeekStart: 1,
-// 	onSelectDate: function(ct) {
-// 		selectWeek(ct);
-// 	},
-// });
-
-
 /* РЕЄСТРАЦІЯ ОБРОБНИКІВ ПОДІЙ */
 
 // Натиснута кнопка створення події
 $('#create-event').on('click', () => {
 	let form = $('#editevent form')[0];
+	form.elements.id.value = '';
 	form.elements.date1.value = moment().format('YYYY-MM-DDTHH:mm');
 	form.elements.date2.value = moment().add(1, 'hours').format('YYYY-MM-DDTHH:mm');
 	form.elements.desc.value = '';
@@ -121,6 +110,7 @@ $('#month-placeholder').on('click', '.day-block', function(event) {
 	if ($(event.target).hasClass('day-block') || $(event.target).hasClass('day-wrapper')) {
 		let date = $(this).find('.date-number a').data('date');
 		let form = $('#editevent form')[0];
+		form.elements.id.value = '';
 		form.elements.date1.value = moment(date).set({hour: 0, minute: 0}).format('YYYY-MM-DDTHH:mm');
 		form.elements.date2.value = moment(date).set({hour: 23, minute: 59}).format('YYYY-MM-DDTHH:mm');
 		form.elements.desc.value = '';
@@ -376,3 +366,6 @@ $('.scale .btn').on('click', function() {
 $(window).on('resize', () => {
 	if (['day', 'week'].indexOf(viewMode) !== -1) view.renderLongEvents();
 });
+
+// Вимкнути відправку форми
+$('form').on('submit', (e) => e.preventDefault());

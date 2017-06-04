@@ -1,5 +1,4 @@
 /* global moment, _, Handlebars, ics, showNotification */
-moment.locale('uk');
 
 /**
  * Подія
