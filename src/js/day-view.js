@@ -1,28 +1,41 @@
-/* global moment, _, eventList, Handlebars, selectWeek, viewMode */
+/* global moment, _, eventList, Handlebars, selectWeek, viewMode, CustomView */
 
-class DayView {
+/**
+ *  Представлення для відображення дня та тижня
+ *  @extends CustomView
+ */
+class DayView extends CustomView {
 
-	constructor(baseDate) {
-		this.baseDate = baseDate;
-		this.daysCount = 7;
+	/**
+	 * @param {moment} baseDate - дата початку періоду, що відображається
+	 * @param {number} daysCount - кількість днів, що відображається
+	 */
+	constructor(baseDate, daysCount) {
+		super(baseDate);
+		this.daysCount = daysCount;
 	}
 
-	setBaseDate(baseDate) {
-		this.baseDate = baseDate;
-	}
-
-	getBaseDate() {
-		return this.baseDate;
-	}
-
+	/**
+	 * Змінити базову дату
+	 * @param {number} addition - Кількість днів. Значення може бути від'ємним
+	 */
 	moveBaseDate(addition) {
 		this.baseDate = moment(this.baseDate).add(addition, 'days');
 	}
-	
+
+	/**
+	 * Встановити кількість днів, що відображатимуться в сітці
+	 * @param {number} count - 7-для тижня, 1-для дня
+	 */
 	setDaysCount(count) {
 		this.daysCount = count;
 	}
 
+	/**
+	 * Розмістити події для відображення у представленні
+	 * @param {Array} plainArray - Масив подій впорядкований за зростанням часу початку події
+	 * @return {Array} - Двовимірний масив, в якому події розташовані так, як мають виводитись в сітку
+	 */
 	arrangeDayEvents(plainArray) {
 
 		if (!plainArray.length) return plainArray;
@@ -86,10 +99,13 @@ class DayView {
 			i++;
 		}
 
-		// console.log('array2d', array2d);
 		return array2d;
 	}
 
+	/**
+	 * Відобразити короткі події за вказаний день
+	 * @param {moment} date - дата, за яку потрібно відобразити події
+	 */
 	renderDayEvents(date) {
 
 		let dayIndex = 0;
@@ -133,6 +149,9 @@ class DayView {
 
 	}
 
+	/**
+	 * Відобразити сітку календаря
+	 */
 	renderGrid() {
 		let $place = $('#week-placeholder');
 		let source = document.getElementById('week-template').innerHTML;
@@ -154,9 +173,12 @@ class DayView {
 				text = moment(this.baseDate).format('DD MMMM YYYY');
 			}
 		}
-		$('.header .nav-block .week-number').text(text);
+		$('header .nav-block .period-label').text(text);
 	}
 
+	/**
+	 * Відобразити короткі події за весь період відображення
+	 */
 	renderShortEvents() {
 		let currentDay = _.cloneDeep(this.baseDate);
 		for (let days = 0; days < this.daysCount; days++) {
@@ -165,6 +187,9 @@ class DayView {
 		}
 	}
 
+	/**
+	 * Відобразити довгі події
+	 */
 	renderLongEvents() {
 		let startOfWeek = _.cloneDeep(this.baseDate);
 		let endOfWeek = _.cloneDeep(this.baseDate);
@@ -263,12 +288,20 @@ class DayView {
 
 	}
 
+	/**
+	 * Відобразити сітку та всі події обраного періоду
+	 */
 	renderView() {
 		this.renderGrid();
 		this.renderShortEvents();
 		this.renderLongEvents();
 	}
 
+	/**
+	 * Оновити область виділення днів на панелі довгих подій. Має виконуватись при зміні виділеного періоду
+	 * @param {moment} firstDay - перший виділений день
+	 * @param {moment} lastDay - останній виділений день
+	 */
 	updateFullDaySelection(firstDay, lastDay) {
 		let $allDays = $('.day-full');
 		$allDays.removeClass('selected-day');
@@ -279,4 +312,3 @@ class DayView {
 		}
 	}
 }
-

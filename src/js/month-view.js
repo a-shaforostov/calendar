@@ -1,19 +1,21 @@
-/* global moment, eventList, Handlebars */
+/* global moment, eventList, Handlebars, CustomView */
 
-class MonthView {
+/**
+ *  Представлення для відображення місяця
+ *  @extends CustomView
+ */
+class MonthView extends CustomView {
 
+	/**
+	 * @param {moment} baseDate - дата початку періоду, що відображається
+	 */
 	constructor(baseDate) {
-		this.baseDate = baseDate;
+		super(baseDate);
 	}
 
-	setBaseDate(baseDate) {
-		this.baseDate = baseDate;
-	}
-
-	getBaseDate() {
-		return this.baseDate;
-	}
-
+	/**
+	 * Відобразити календар місяця
+	 */
 	renderView() {
 		let $place = $('#month-placeholder');
 		let source = document.getElementById('month-template').innerHTML;
@@ -48,7 +50,7 @@ class MonthView {
 		$place.html(template({days, daysOfWeek}));
 
 		let text = moment(this.baseDate).format('MMMM YYYY');
-		$('.header .nav-block .week-number').text(text);
+		$('header .nav-block .period-label').text(text);
 	}
 
 }

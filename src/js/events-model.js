@@ -1,14 +1,25 @@
 /* global moment, _, Handlebars, ics, showNotification */
 moment.locale('uk');
 
+/**
+ * Подія
+ */
 class Event {
 
+	/**
+	 * @param {moment | String | Date} begin - Час початку події
+	 * @param {moment | String | Date} end - Час закінчення події
+	 * @param {String} desc - Опис події
+	 */
 	constructor(begin, end, desc) {
 		this.begin = moment(begin);
 		this.end = moment(end);
 		this.desc = desc;
 	}
 
+	/**
+	 * Зберегти подію в файл ics
+	 */
 	exportEvent() {
 		let filename = this.desc.replace(/[|&;$%@"<>()+,]/g, '').substr(0, 50);
 		let cal = ics();
@@ -18,13 +29,26 @@ class Event {
 
 }
 
+/**
+ * Список всіх подій
+ */
 class EventsList {
 
+	/**
+	 *
+	 */
 	constructor() {
 		this.eventIdCounter = 1;
 		this.events = {};
 	}
 
+	/**
+	 * Додати подію
+	 * @param {moment | String | Date} begin - Час початку події
+	 * @param {moment | String | Date} end - Час закінчення події
+	 * @param {String} desc - Опис події
+	 * @return {number} Id створеної події
+	 */
 	addEvent({begin, end, desc}) {
 		// Якщо кінець періода припадає на початок доби - зменшити період на хвилину
 		if (moment(end).format('HHmmss') === '000000') end = moment(end).subtract(1, 'minute');
@@ -47,6 +71,13 @@ class EventsList {
 		return this.eventIdCounter++;
 	}
 
+	/**
+	 * Оновити подію
+	 * @id {number} Id події, яку потрібно оновити
+	 * @param {moment | String | Date} begin - Час початку події
+	 * @param {moment | String | Date} end - Час закінчення події
+	 * @param {String} desc - Опис події
+	 */
 	updateEvent({id, begin, end, desc}) {
 		if (moment(end).format('HHmmss') === '000000') end = moment(end).subtract(1, 'minute');
 		let event = this.events[id];
@@ -69,6 +100,9 @@ class EventsList {
 		}
 	}
 
+	/**
+	 * Завантажити події з локального сховища
+	 */
 	loadEvents() {
 		// Завантажити події local storage
 		let loadedEvents = [];
@@ -89,10 +123,19 @@ class EventsList {
 		});
 	}
 
+	/**
+	 * Отримати подію за її номером
+	 * @param {number} id
+	 * @return {Event}
+	 */
 	getEvent(id) {
 		return this.events[id];
 	}
 
+	/**
+	 * Видалити подію за її номером
+	 * @param {number} id
+	 */
 	deleteEvent(id) {
 		// Видалення з localStorage
 		localStorage.removeItem('event-' + id, JSON.stringify(event));
@@ -102,7 +145,12 @@ class EventsList {
 		delete this.events[id];
 	}
 
-	// Повернути короткі події за день, сортування за зростанням часу початку
+	/**
+	 * Повернути короткі події за день, сортування за зростанням часу початку
+	 * @param {moment} date - Дата, за яку потрібно отримати події
+	 * @param {boolean} [all] - true - вивести і довгі і короткі події. false - тільки короткі
+	 * @return {Event[]} - Масив подій, впорядкованих за зростанням
+	 */
 	getEventsByDay(date, all) {
 		let eventsByDate = {};
 		$.each(this.events, (index, item) => {
@@ -117,7 +165,12 @@ class EventsList {
 		return _.sortBy(eventsByDate, ['begin', 'end', 'desc']);
 	}
 
-	// Повернути довгі події що зачіпають тиждень, сортування за зростанням дати початку
+	/**
+	 * Повернути довгі події що зачіпають відображений період, сортування за зростанням
+	 * @param {moment} date - Дата, за яку потрібно отримати події
+	 * @param {number} daysCount - Кількість днів періода
+	 * @return {Event[]}
+	 */
 	getEventsOfWeek(date, daysCount) {
 		let startOfWeek = _.cloneDeep(date);
 		let endOfWeek = _.cloneDeep(date);
@@ -136,53 +189,3 @@ class EventsList {
 	}
 
 }
-
-// test
-// let events = [
-// 	{
-// 		begin: moment([2017, 4, 27, 12, 25]),
-// 		end: moment([2017, 4, 27, 14, 45]),
-// 		desc: 'Обед',
-// 	},
-// 	{
-// 		begin: moment([2017, 4, 27, 12, 20]),
-// 		end: moment([2017, 4, 27, 13, 30]),
-// 		desc: 'Встреча',
-// 	},
-// 	{
-// 		begin: moment([2017, 4, 27, 9, 10]),
-// 		end: moment([2017, 4, 27, 11, 40]),
-// 		desc: 'Автобус',
-// 	},
-// 	{
-// 		begin: moment([2017, 4, 27, 14, 15]),
-// 		end: moment([2017, 4, 27, 15, 10]),
-// 		desc: 'Собеседование',
-// 	},
-// 	{
-// 		begin: moment([2017, 4, 28, 12, 25]),
-// 		end: moment([2017, 4, 28, 14, 45]),
-// 		desc: 'Обед',
-// 	},
-// 	{
-// 		begin: moment([2017, 4, 28, 12, 20]),
-// 		end: moment([2017, 4, 28, 13, 30]),
-// 		desc: 'Встреча',
-// 	},
-// 	{
-// 		begin: moment([2017, 4, 29, 9, 10]),
-// 		end: moment([2017, 4, 29, 11, 40]),
-// 		desc: 'Автобус',
-// 	},
-// 	{
-// 		begin: moment([2017, 4, 29, 14, 15]),
-// 		end: moment([2017, 4, 29, 15, 10]),
-// 		desc: 'Собеседование',
-// 	},
-// ];
-//
-// events.forEach( (item) => {
-// 	eventList.addEvent(item);
-// });
-
-

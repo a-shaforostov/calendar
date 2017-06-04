@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Calendar</title>
     <link rel="stylesheet" href="vendors/materialize-v0.98.2/css/materialize.min.css">
-    <link rel="stylesheet" href="vendors/datetimepicker/jquery.datetimepicker.min.css">
+    <!--<link rel="stylesheet" href="vendors/datetimepicker/jquery.datetimepicker.min.css">-->
     <link rel="stylesheet" href="style/core.css">
 
     <script src="vendors/lodash.min.js"></script>
@@ -16,12 +16,13 @@
     <script src="vendors/moment-with-locales.min.js"></script>
 </head>
 <body>
-    <div class="header clearfix">
+
+    <header class="clearfix">
         <button class="waves-effect waves-light btn" id="create-event">Додати подію</button>
         <div class="nav-block">
-            <button class="left-week-button btn">&lt;</button>
-            <span class="week-number"></span>
-            <button class="right-week-button btn">&gt;</button>
+            <button class="prev-period-button btn">&lt;</button>
+            <span class="period-label"></span>
+            <button class="next-period-button btn">&gt;</button>
         </div>
         <div class="scale">
             <div class="btn-group">
@@ -31,24 +32,20 @@
                 <a class="waves-effect waves-light btn" data-period="year">Рік</a>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="content">
-        <!--<aside>-->
-            <!--&lt;!&ndash;<button onclick="notifyMe('Notification text');">Notify!</button>&ndash;&gt;-->
-            <!--<input id="month-calendar" class="date-picker-inline">-->
-        <!--</aside>-->
+    <main>
 
-        <div id="week-placeholder" class="noselect view-content clearfix"></div>
-        <div id="month-placeholder" class="noselect view-content clearfix"></div>
-        <div id="year-placeholder" class="noselect view-content clearfix"></div>
+        <section id="week-placeholder"  class="noselect view-content clearfix"></section>
+        <section id="month-placeholder" class="noselect view-content clearfix"></section>
+        <section id="year-placeholder"  class="noselect view-content clearfix"></section>
 
-        <div class="wrapper"></div>
+    </main>
 
-    </div>
-
+    <!--Шаблон тижня та дня-->
      <script type="text/x-handlebars-template" id="week-template">
         <div class="week">
+
             <!--Заголовки днів-->
             <table class="grid-table">
                 <thead>
@@ -60,6 +57,7 @@
                 </tr>
                 </thead>
             </table>
+
             <!--Поле для довгих подій-->
             <div class="long-wrapper">
                 <div class="long-events"></div>
@@ -72,6 +70,7 @@
                     </tbody>
                 </table>
             </div>
+
             <!--Поле для коротких подій-->
             <table class="grid-table s-events">
                 <tbody>
@@ -99,6 +98,7 @@
         </div>
     </script>
 
+    <!--Шаблон місяця-->
     <script type="text/x-handlebars-template" id="month-template">
         <div class="month">
             <table>
@@ -137,6 +137,7 @@
         </div>
     </script>
 
+    <!--Шаблон року-->
     <script type="text/x-handlebars-template" id="year-template">
         {{#each months}}
         <div class="month">
@@ -144,7 +145,7 @@
             <table>
                 <thead>
                     <tr>
-                        {{#each ../daysOfWeek}}<td class="year-day-caption {{#eq @index 5}}holiday{{/eq}}{{#eq @index 6}}holiday{{/eq}}">{{this}}</td>{{/each}}
+                        {{#each ../daysOfWeek}}<td class="year-day-caption {{#iff @index '>' 4}}holiday{{/iff}}">{{this}}</td>{{/each}}
                     </tr>
                 </thead>
                 <tbody>
@@ -167,9 +168,8 @@
         {{/each}}
     </script>
 
-
-    <!-- Modal Structure -->
-    <div id="editevent" class="modal">
+    <!-- Модальне вікно створення/редагування події -->
+    <dialog id="editevent" class="modal">
         <div class="modal-content">
             <h4>Редагування події</h4>
 
@@ -196,13 +196,13 @@
             </div>
 
         </div>
-        <div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect waves-red btn red" id="delete-event">Видалити</a>
-            <a href="#!" class="modal-action modal-close waves-effect waves-green btn" id="export-event">Експорт в .ics</a>
-            <a href="#!" class="modal-action modal-close waves-effect waves-white btn white black-text">Відмінити</a>
-            <a href="#!" class="modal-action modal-close waves-effect waves-green btn" id="create-event-ok">Зберегти</a>
-        </div>
-    </div>
+        <footer class="modal-footer">
+            <a href="#" class="modal-action modal-close waves-effect waves-red btn red" id="delete-event">Видалити</a>
+            <a href="#" class="modal-action modal-close waves-effect waves-green btn" id="export-event">Експорт в .ics</a>
+            <a href="#" class="modal-action modal-close waves-effect waves-white btn white black-text">Відмінити</a>
+            <a href="#" class="modal-action modal-close waves-effect waves-green btn" id="create-event-ok">Зберегти</a>
+        </footer>
+    </dialog>
 
     <script src="vendors/materialize-v0.98.2/js/materialize.min.js"></script>
     <script src="vendors/handlebars-v4.0.10.js"></script>
@@ -210,16 +210,17 @@
     <script src="js/hbs-helpers.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/events-model.js"></script>
+    <script src="js/custom-view.js"></script>
     <script src="js/day-view.js"></script>
     <script src="js/month-view.js"></script>
     <script src="js/year-view.js"></script>
     <script src="js/controller.js"></script>
-    <!--<script>-->
-        <!--if('serviceWorker' in navigator) {-->
-            <!--navigator.serviceWorker-->
-                    <!--.register('/service_worker.js')-->
-                    <!--.then(function() { console.log("Service Worker Registered"); });-->
-        <!--}-->
-    <!--</script>-->
+    <script>
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                    .register('/service_worker.js')
+                    .then(function() { console.log("Service Worker Registered"); });
+        }
+    </script>
 </body>
 </html>

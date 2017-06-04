@@ -1,6 +1,8 @@
 /* global eventList, moment, weekView, Materialize, EventsList, DayView, MonthView, YearView */
+/* eslint-disable no-invalid-this */
 
-const viewModesList = ['day', 'week', 'month', 'year'];
+// Доступні періоди 'day', 'week', 'month', 'year';
+// Ініціалізуємо тиждень
 let viewMode = 'week';
 
 // Створити список подій і завантажити події
@@ -8,10 +10,38 @@ let eventList = new EventsList();
 eventList.loadEvents();
 
 // Створити представлення
-let view = new DayView(moment().startOf('week'));
+let view = new DayView(moment().startOf('week'), 7);
 view.renderView();
 
 
+/* ІНІЦІАЛІЗАЦІЯ ЕЛЕМЕНТІВ */
+
+// Модальне вікно редагування події
+$('#editevent').modal({
+	complete: () => {
+		if ($timeSelector) $timeSelector.remove();
+		$('.day-full').removeClass('selected-day');
+	},
+});
+
+
+// $.datetimepicker.setLocale('uk');
+// $('.date-picker-inline').datetimepicker({
+// 	format: 'd.m.Y',
+// 	inline: true,
+// 	lang: 'uk',
+// 	timepicker: false,
+// 	defaultDate: new Date(),
+// 	dayOfWeekStart: 1,
+// 	onSelectDate: function(ct) {
+// 		selectWeek(ct);
+// 	},
+// });
+
+
+/* РЕЄСТРАЦІЯ ОБРОБНИКІВ ПОДІЙ */
+
+// Натиснута кнопка створення події
 $('#create-event').on('click', () => {
 	let form = $('#editevent form')[0];
 	form.elements.date1.value = moment().format('YYYY-MM-DDTHH:mm');
@@ -21,14 +51,21 @@ $('#create-event').on('click', () => {
 	$('#editevent').modal('open');
 });
 
+// Натиснута кнопка "створити" в модальному вікні редагування події
 $('#create-event-ok').on('click', (event) => {
 	let form = $('#editevent form')[0];
+
+	// Валідація
 	if (!form.checkValidity() || moment(form.elements.date1.value).isAfter(form.elements.date2.value)) {
+
 		alert('Не вірно заповнені поля');
 		event.preventDefault();
 		event.stopImmediatePropagation();
+
 	} else {
+
 		if (form.elements.id && form.elements.id.value) {
+			// Змінити подію
 			eventList.updateEvent({
 				id: form.elements.id.value,
 				begin: moment(form.elements.date1.value),
@@ -36,16 +73,20 @@ $('#create-event-ok').on('click', (event) => {
 				desc: form.elements.desc.value,
 			});
 		} else {
+			// Створити подію
 			eventList.addEvent({
 				begin: moment(form.elements.date1.value),
 				end: moment(form.elements.date2.value),
 				desc: form.elements.desc.value,
 			});
 		}
+
+		// Оновити представлення
 		view.renderView();
 	}
 });
 
+// Натиснута кнопка видалення події
 $('#delete-event').on('click', () => {
 	let form = $('#editevent form')[0];
 	if (form.elements.id && form.elements.id.value) {
@@ -54,12 +95,15 @@ $('#delete-event').on('click', () => {
 	}
 });
 
+// Натиснута кнопка збереження в файл
 $('#export-event').on('click', () => {
 	let form = $('#editevent form')[0];
 	eventList.getEvent(form.elements.id.value).exportEvent();
 });
 
-$('body').on('click', '#month-placeholder .event-item, #week-placeholder .event, #week-placeholder .long-event', function() {
+// Клік по події ініціює редагування події
+let selector = '#month-placeholder .event-item, #week-placeholder .event, #week-placeholder .long-event';
+$('body').on('click', selector, function() {
 	let eventId = $(this).data('id');
 	let event = eventList.getEvent(eventId);
 	let form = $('#editevent form')[0];
@@ -72,7 +116,7 @@ $('body').on('click', '#month-placeholder .event-item, #week-placeholder .event,
 	Materialize.updateTextFields();
 });
 
-// Створити нову подію за вказаний на місячному календарі день
+// Клік по полю дати на місячному календарі - створити нову подію за обраний день
 $('#month-placeholder').on('click', '.day-block', function(event) {
 	if ($(event.target).hasClass('day-block') || $(event.target).hasClass('day-wrapper')) {
 		let date = $(this).find('.date-number a').data('date');
@@ -85,13 +129,15 @@ $('#month-placeholder').on('click', '.day-block', function(event) {
 	}
 });
 
+// Обрати тиждень
 function selectWeek(date) {
 	let baseDate = moment(date).startOf('week');
 	view.setBaseDate(baseDate);
 	view.renderView();
 }
 
-$('.left-week-button').on('click', () => {
+// Натиснута кнопка зміни періода (попередній період)
+$('.prev-period-button').on('click', () => {
 	if (viewMode === 'week') {
 		view.moveBaseDate(-7);
 	} else {
@@ -100,14 +146,18 @@ $('.left-week-button').on('click', () => {
 		} else {
 			if (viewMode === 'month') {
 				view.setBaseDate(moment(view.getBaseDate()).subtract(1, 'month'));
-				view.renderView();
+			} else {
+				if (viewMode === 'year') {
+					view.setBaseDate(moment(view.getBaseDate()).subtract(1, 'year'));
+				}
 			}
 		}
 	}
 	view.renderView();
 });
 
-$('.right-week-button').on('click', () => {
+// Натиснута кнопка зміни періода (наступиий період)
+$('.next-period-button').on('click', () => {
 	if (viewMode === 'week') {
 		view.moveBaseDate(7);
 	} else {
@@ -116,13 +166,17 @@ $('.right-week-button').on('click', () => {
 		} else {
 			if (viewMode === 'month') {
 				view.setBaseDate(moment(view.getBaseDate()).add(1, 'month'));
-				view.renderView();
+			} else {
+				if (viewMode === 'year') {
+					view.setBaseDate(moment(view.getBaseDate()).add(1, 'year'));
+				}
 			}
 		}
 	}
 	view.renderView();
 });
 
+// Натиснуто на дату на місячному або на річному календарі - перейти в режим дня
 $('#month-placeholder, #year-placeholder').on('click', '.date-number a', function(event) {
 	event.preventDefault();
 
@@ -132,8 +186,7 @@ $('#month-placeholder, #year-placeholder').on('click', '.date-number a', functio
 	$('.view-content').html('');
 
 	viewMode = 'day';
-	view = new DayView(moment(date));
-	view.setDaysCount(1);
+	view = new DayView(moment(date), 1);
 	view.renderView();
 
 	$('.scale .btn[data-period="day"]').addClass('selected');
@@ -290,9 +343,9 @@ $('body').on('mouseup', () => {
 		$('#editevent').modal('open');
 	}
 });
-
 /* ----------------------------------------- */
 
+// Натиснуто кнопку вибору періоду
 $('.scale .btn').on('click', function() {
 
 	$('.scale .btn').removeClass('selected');
@@ -301,12 +354,10 @@ $('.scale .btn').on('click', function() {
 	viewMode = $(this).data('period');
 	switch (viewMode) {
 		case 'day':
-			view = new DayView(view.getBaseDate());
-			view.setDaysCount(1);
+			view = new DayView(view.getBaseDate(), 1);
 			break;
 		case 'week':
-			view = new DayView(view.getBaseDate().startOf('week'));
-			view.setDaysCount(7);
+			view = new DayView(view.getBaseDate().startOf('week'), 7);
 			break;
 		case 'month':
 			view = new MonthView(view.getBaseDate());
@@ -321,26 +372,7 @@ $('.scale .btn').on('click', function() {
 
 });
 
+// При зміні розміру вікна оновити довгі події бо вони позиціоновані абсолютно
 $(window).on('resize', () => {
 	if (['day', 'week'].indexOf(viewMode) !== -1) view.renderLongEvents();
-});
-
-$('#editevent').modal({
-	complete: () => {
-		if ($timeSelector) $timeSelector.remove();
-		$('.day-full').removeClass('selected-day');
-	},
-});
-
-$.datetimepicker.setLocale('uk');
-$('.date-picker-inline').datetimepicker({
-	format: 'd.m.Y',
-	inline: true,
-	lang: 'uk',
-	timepicker: false,
-	defaultDate: new Date(),
-	dayOfWeekStart: 1,
-	onSelectDate: function(ct) {
-		selectWeek(ct);
-	},
 });

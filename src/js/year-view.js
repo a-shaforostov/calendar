@@ -1,9 +1,16 @@
-/* global moment, eventList, Handlebars */
+/* global moment, eventList, Handlebars, CustomView */
 
-class YearView {
+/**
+ *  Представлення для відображення року
+ *  @extends CustomView
+ */
+class YearView extends CustomView {
 
+	/**
+	 * @param {moment} baseDate - дата початку періоду, що відображається
+	 */
 	constructor(baseDate) {
-		this.baseDate = baseDate;
+		super(baseDate);
 		this.stateHolidays = [
 			'2017-01-01',
 			'2017-01-02',
@@ -24,19 +31,13 @@ class YearView {
 		];
 	}
 
-	setBaseDate(baseDate) {
-		this.baseDate = baseDate;
-	}
-
-	getBaseDate() {
-		return this.baseDate;
-	}
-
+	/**
+	 * Відобразити календар року
+	 */
 	renderView() {
 		let $place = $('#year-placeholder');
 		let source = document.getElementById('year-template').innerHTML;
 		let template = Handlebars.compile(source);
-
 
 		let months = [];
 		for (let currentMonth = 0; currentMonth < 12; currentMonth++) {
@@ -47,10 +48,10 @@ class YearView {
 			let wi = 0;
 			let di = firstDayOfWeek;
 			let currentDay = moment(firstDay);
-			let isStateHoliday = this.stateHolidays.indexOf(currentDay.format('YYYY-MM-DD')) !== -1;
 			for (let i = 0; i <= totalDays-1; i++) {
 				if (!days[wi]) days[wi] = new Array(7).fill(null);
 				let events = eventList.getEventsByDay(currentDay, true);
+				let isStateHoliday = this.stateHolidays.indexOf(currentDay.format('YYYY-MM-DD')) !== -1;
 				days[wi][di] = {
 					day: currentDay.get('date'),
 					events: events.length,
@@ -75,6 +76,6 @@ class YearView {
 		$place.html(template({months, daysOfWeek}));
 
 		let text = moment(this.baseDate).format('YYYY');
-		$('.header .nav-block .week-number').text(text);
+		$('header .nav-block .period-label').text(text);
 	}
 }
