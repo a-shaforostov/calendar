@@ -1,4 +1,4 @@
-/* global moment, _, Handlebars, WeekView */
+/* global moment, _, Handlebars, ics, showNotification */
 moment.locale('uk');
 
 class Event {
@@ -10,8 +10,8 @@ class Event {
 	}
 
 	exportEvent() {
-		let filename = this.desc.replace(/[|&;$%@"<>()+,]/g, "").substr(0, 50);
-		var cal = ics();
+		let filename = this.desc.replace(/[|&;$%@"<>()+,]/g, '').substr(0, 50);
+		let cal = ics();
 		cal.addEvent(this.desc, '', '', this.begin, this.end);
 		cal.download(filename);
 	}
@@ -40,7 +40,7 @@ class EventsList {
 		// Нотифікация
 		let timediff = moment.duration(moment(begin).diff(moment(new Date())));
 		if (timediff > 0) {
-			event.timer = setTimeout(function () {
+			event.timer = setTimeout(() => {
 				showNotification('Починається подія ', {body: desc, icon: '../images/alarm-clock.png'});
 			}, timediff);
 		}
@@ -63,13 +63,13 @@ class EventsList {
 		// Нотифікация
 		let timediff = moment.duration(moment(begin).diff(moment(new Date())));
 		if (timediff > 0) {
-			event.timer = setTimeout(function () {
+			event.timer = setTimeout(() => {
 				showNotification('Починається подія ', {body: desc, icon: 'images/alarm-clock.png'});
 			}, timediff);
 		}
 	}
 
-	loadEvents(){
+	loadEvents() {
 		// Завантажити події local storage
 		let loadedEvents = [];
 		let lsKeys = Object.keys(localStorage);

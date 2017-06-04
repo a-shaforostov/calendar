@@ -11,7 +11,6 @@ const del = require('del');
 const plumber = require('gulp-plumber');
 const babel = require('gulp-babel');
 const htmlmin = require('gulp-htmlmin');
-// const gulpServiceWorker = require('gulp-serviceworker');
 
 const less = require('gulp-less');
 const LessPluginCleanCSS = require('less-plugin-clean-css');
@@ -62,11 +61,11 @@ gulp.task('js:lint', () => {
 });
 
 gulp.task('html:build', () => {
-    gulp.src(path.src.html) //Выберем файлы по нужному пути
-        .pipe(rigger()) //Прогоним через rigger
+    gulp.src(path.src.html)
+        .pipe(rigger())
         .pipe(plumber())
-        .pipe(htmlmin({collapseWhitespace: true})) // Минификация
-        .pipe(gulp.dest(path.build.html)); //Выплюнем их в папку build
+        .pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(gulp.dest(path.build.html));
 });
 
 gulp.task('js:build', () => {
@@ -79,13 +78,6 @@ gulp.task('js:build', () => {
         .pipe(production(uglify()))
         .pipe(gulp.dest(path.build.js));
 });
-
-// gulp.task('offline', ['build'], function() {
-//     return gulp.src(['public/*'])
-//         .pipe(gulpServiceWorker({
-//             rootDir: 'public/',
-//         }));
-// });
 
 gulp.task('style:build', () => {
     const cleanCSSPlugin = new LessPluginCleanCSS({advanced: true});
@@ -113,8 +105,8 @@ gulp.task('watch', () => {
         gulp.start('style:build');
     });
     watch([path.watch.js], function(event, cb) {
-        // gulp.start('js:build', ['js:lint']);
-        gulp.start('js:build');
+        gulp.start('js:build', ['js:lint']);
+        // gulp.start('js:build');
     });
 });
 
@@ -124,6 +116,5 @@ gulp.task('build', [
     'style:build'
 ]);
 
-// gulp.task('default', ['js:lint', 'build']);
-// gulp.task('default', ['offline']);
-gulp.task('default', ['build']);
+gulp.task('default', ['js:lint', 'build']);
+// gulp.task('default', ['build']);

@@ -8,11 +8,13 @@ self.addEventListener('install', function(event) {
 				'/',
 				'/index.html',
 				'/images/alarm-clock.png',
-				'/js/controller.js',
-				'/js/events-model.js',
 				'/js/hbs-helpers.js',
 				'/js/notifications.js',
+				'/js/controller.js',
+				'/js/events-model.js',
 				'/js/day-view.js',
+				'/js/month-view.js',
+				'/js/year-view.js',
 				'/style/core.css',
 				'/vendors/handlebars-v4.0.10.js',
 				'/vendors/ics.min.js',
@@ -30,8 +32,6 @@ self.addEventListener('install', function(event) {
 
 
 self.addEventListener('fetch', function(event) {
-
-	console.log(event.request.url);
 
 	event.respondWith(
 

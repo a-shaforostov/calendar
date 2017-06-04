@@ -1,4 +1,4 @@
-/* global eventList, moment, weekView, Materialize */
+/* global eventList, moment, weekView, Materialize, EventsList, DayView, MonthView, YearView */
 
 const viewModesList = ['day', 'week', 'month', 'year'];
 let viewMode = 'week';
@@ -140,17 +140,19 @@ $('#month-placeholder, #year-placeholder').on('click', '.date-number a', functio
 
 });
 
-/*******************************************/
-/* Створення подій через “малювання” мишею */
+/* ----------------------------------------- */
+/* Створення подій через “малювання” мишею  */
 
 let $timeSelector;
-let timeSelectorTime1, timeSelectorTime2;
+let timeSelectorTime1;
+let timeSelectorTime2;
 let timeSelectorActiveShort = false;
 let timeSelectorActiveLong = false;
-let firstDay, lastDay;
+let firstDay;
+let lastDay;
 
 // Почати виділення
-$('#week-placeholder').on('mousedown', '.day-col, .day-full', function (event) {
+$('#week-placeholder').on('mousedown', '.day-col, .day-full', function(event) {
 
 	// Не продовжувати, якщо клік по блоку події
 	if ($(event.target).hasClass('event') || $(event.target).closest('.event').length) return;
@@ -193,7 +195,7 @@ $('#week-placeholder').on('mousedown', '.day-col, .day-full', function (event) {
 });
 
 // Виділення діапазону при переміщенні вказівника миші
-$('#week-placeholder').on('mousemove', '.s-events .day-col, .l-events .day-full', function (event) {
+$('#week-placeholder').on('mousemove', '.s-events .day-col, .l-events .day-full', function(event) {
 
 	// Відстежувати переміщення якщо натиснута ліва кнопка миші
 	if (event.buttons === 1) {
@@ -232,7 +234,7 @@ $('#week-placeholder').on('mousemove', '.s-events .day-col, .l-events .day-full'
 });
 
 // Коли кнопку миші відпустили - закінчити виділення та створити подію
-$('body').on('mouseup', function (event) {
+$('body').on('mouseup', () => {
 
 	if (timeSelectorActiveShort) {
 
@@ -277,7 +279,8 @@ $('body').on('mouseup', function (event) {
 		form.elements.date1.value = moment(view.getBaseDate()).add(d1, 'days').format('YYYY-MM-DDTHH:mm');
 
 		// Сформувати час закінчення події
-		form.elements.date2.value = moment(view.getBaseDate()).add(d2, 'days').set({hour: 23, minute: 59}).format('YYYY-MM-DDTHH:mm');
+		form.elements.date2.value =
+			moment(view.getBaseDate()).add(d2, 'days').set({hour: 23, minute: 59}).format('YYYY-MM-DDTHH:mm');
 
 		form.elements.desc.value = '';
 		form.elements.id.value = '';
@@ -288,7 +291,7 @@ $('body').on('mouseup', function (event) {
 	}
 });
 
-/*******************************************/
+/* ----------------------------------------- */
 
 $('.scale .btn').on('click', function() {
 
@@ -326,7 +329,7 @@ $('#editevent').modal({
 	complete: () => {
 		if ($timeSelector) $timeSelector.remove();
 		$('.day-full').removeClass('selected-day');
-	}
+	},
 });
 
 $.datetimepicker.setLocale('uk');

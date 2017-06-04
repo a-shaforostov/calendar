@@ -1,4 +1,4 @@
-/* global moment, _, eventList, Handlebars, WeekView, selectWeek */
+/* global moment, _, eventList, Handlebars, selectWeek, viewMode */
 
 class DayView {
 
@@ -95,7 +95,7 @@ class DayView {
 		let dayIndex = 0;
 		if (viewMode === 'week') {
 			dayIndex = moment(date).weekday();
-		}  else {
+		} else {
 			if (viewMode === 'day') {
 				dayIndex = 0;
 			}
@@ -181,7 +181,8 @@ class DayView {
 			entity.afterWeek = item.end.isAfter(endOfWeek, 'day');
 			// Перший і останній дні тижня де має бути подія
 			entity.firstDay = entity.beforeWeek ? 0 : moment.duration( moment(item.begin).diff(startOfWeek) ).days();
-			entity.lastDay = entity.afterWeek ? this.daysCount-1 : moment.duration( moment(item.end).diff(startOfWeek) ).days();
+			entity.lastDay =
+				entity.afterWeek ? this.daysCount-1 : moment.duration( moment(item.end).diff(startOfWeek) ).days();
 			// Власне подія
 			entity.event = item;
 
@@ -256,7 +257,6 @@ class DayView {
 		let $tableContent = $('<tr class="week-full">' + tds + '</tr>');
 		$tableContent.find('.day-full').each((index, item) => {
 			$(item).data('day-index', index);
-			console.log($(item).data('day-index'));
 		});
 		$tableContent.css('height', ++maxRow * 20 + 10);
 		$('.header-table tbody').html($tableContent);

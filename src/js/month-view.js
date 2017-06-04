@@ -1,3 +1,5 @@
+/* global moment, eventList, Handlebars */
+
 class MonthView {
 
 	constructor(baseDate) {
@@ -33,7 +35,7 @@ class MonthView {
 				eventCount: Math.max(events.length - 2, 0),
 				alien: currentDay.get('month') !== this.baseDate.get('month'),
 				dateText: currentDay.format('YYYY-MM-DDTHH:mm'),
-				events
+				events,
 			};
 			if (di++ === 6) {
 				di = 0;
@@ -42,8 +44,6 @@ class MonthView {
 			currentDay.add(1, 'day');
 		}
 		let daysOfWeek = ['понеділок', 'вівторок', 'середа', 'четвер', 'п\'ятниця', 'субота', 'неділя'];
-		console.log(days);
-
 
 		$place.html(template({days, daysOfWeek}));
 

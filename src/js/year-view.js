@@ -1,3 +1,5 @@
+/* global moment, eventList, Handlebars */
+
 class YearView {
 
 	constructor(baseDate) {
@@ -19,7 +21,7 @@ class YearView {
 			'2017-08-24',
 			'2017-10-14',
 			'2017-10-16',
-		]
+		];
 	}
 
 	setBaseDate(baseDate) {
@@ -45,6 +47,7 @@ class YearView {
 			let wi = 0;
 			let di = firstDayOfWeek;
 			let currentDay = moment(firstDay);
+			let isStateHoliday = this.stateHolidays.indexOf(currentDay.format('YYYY-MM-DD')) !== -1;
 			for (let i = 0; i <= totalDays-1; i++) {
 				if (!days[wi]) days[wi] = new Array(7).fill(null);
 				let events = eventList.getEventsByDay(currentDay, true);
@@ -52,7 +55,7 @@ class YearView {
 					day: currentDay.get('date'),
 					events: events.length,
 					dateText: currentDay.format('YYYY-MM-DDTHH:mm'),
-					holiday: ([5,6].indexOf(di) !== -1) || (this.stateHolidays.indexOf(currentDay.format('YYYY-MM-DD')) !== -1),
+					holiday: [5, 6].indexOf(di) !== -1 || isStateHoliday,
 				};
 				if (di++ === 6) {
 					di = 0;
@@ -62,7 +65,7 @@ class YearView {
 			}
 			months.push({
 				days,
-				monthName: firstDay.format('MMMM')
+				monthName: firstDay.format('MMMM'),
 			});
 		}
 
